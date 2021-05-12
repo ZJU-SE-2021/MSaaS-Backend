@@ -8,9 +8,11 @@ namespace MsaasBackend.Models
 
         public string Username { get; set; }
 
-        public string Password { get; set; }
+        public string PasswordHash { get; set; }
 
-        public UserDto GetDto() => new UserDto
+        public string Role { get; set; } = "User";
+
+        public UserDto ToDto() => new()
         {
             Id = Id,
             Username = Username
@@ -25,6 +27,13 @@ namespace MsaasBackend.Models
     }
 
     public class LoginForm
+    {
+        [Required] public string Username { get; set; }
+
+        [Required] public string Password { get; set; }
+    }
+
+    public class RegisterForm
     {
         [Required] public string Username { get; set; }
 
