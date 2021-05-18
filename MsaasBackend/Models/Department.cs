@@ -1,4 +1,5 @@
-﻿using System.ComponentModel.DataAnnotations;
+﻿using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
 
 namespace MsaasBackend.Models
 {
@@ -9,6 +10,8 @@ namespace MsaasBackend.Models
 
         public int HospitalId { get; set; }
         public Hospital Hospital { get; set; }
+
+        public List<Physician> Physicians { get; set; }
     }
 
     public class DepartmentDto
@@ -21,5 +24,10 @@ namespace MsaasBackend.Models
     public class DepartmentCreationForm
     {
         [Required] public string Name { get; set; }
+    }
+
+    public class PhysicianRegisterForm
+    {
+        public int PhysicianId { get; set; }
     }
 }

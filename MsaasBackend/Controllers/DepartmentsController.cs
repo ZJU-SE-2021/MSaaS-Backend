@@ -33,5 +33,11 @@ namespace Msaasbackend.Controllers
         {
             throw new NotImplementedException();
         }
+
+        [HttpPost("{id:int}/Physicians")]
+        public Task<IActionResult> RegisterPhysician(int id, PhysicianRegisterForm form)
+        {
+            throw new NotImplementedException();
+        }
     }
 }

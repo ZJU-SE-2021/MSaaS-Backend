@@ -15,11 +15,14 @@ namespace MsaasBackend.Models
 
         public DbSet<Department> Departments { get; set; }
 
+        public DbSet<Physician> Physicians { get; set; }
+
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             modelBuilder.Entity<User>().ToTable(nameof(Users));
             modelBuilder.Entity<Hospital>().ToTable(nameof(Hospitals));
             modelBuilder.Entity<Department>().ToTable(nameof(Departments));
+            modelBuilder.Entity<Physician>().ToTable(nameof(Physicians));
         }
     }
 }
