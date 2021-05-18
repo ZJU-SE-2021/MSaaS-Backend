@@ -1,3 +1,4 @@
+using System;
 using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
@@ -24,6 +25,25 @@ namespace MsaasBackend.Controllers
         {
             var hospitals = from h in _context.Hospitals select h.toDto();
             return Ok(hospitals);
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> CreateHospital(HospitalCreationForm form)
+        {
+            throw new NotImplementedException();
+        }
+
+        [HttpPatch]
+        public async Task<IActionResult> ModifyHospital(HospitalCreationForm form)
+        {
+            throw new NotImplementedException();
+        }
+
+        [HttpDelete]
+        [Route("{id}")]
+        public async Task<IActionResult> DeleteHospital(int id)
+        {
+            throw new NotImplementedException();
         }
     }
 }
