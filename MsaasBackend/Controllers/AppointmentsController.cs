@@ -25,5 +25,11 @@ namespace MsaasBackend.Controllers
         {
             throw new NotImplementedException();
         }
+
+        [HttpPost("{id:int}/MedicalRecord")]
+        public async Task<IActionResult> AddMedicalRecord(int id, MedicalRecordForm form)
+        {
+            throw new NotImplementedException();
+        }
     }
 }
