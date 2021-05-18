@@ -17,12 +17,18 @@ namespace MsaasBackend.Models
 
         public DbSet<Physician> Physicians { get; set; }
 
+        public DbSet<Appointment> Appointments { get; set; }
+
+        public DbSet<MedicalRecord> MedicalRecords { get; set; }
+
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             modelBuilder.Entity<User>().ToTable(nameof(Users));
             modelBuilder.Entity<Hospital>().ToTable(nameof(Hospitals));
             modelBuilder.Entity<Department>().ToTable(nameof(Departments));
             modelBuilder.Entity<Physician>().ToTable(nameof(Physicians));
+            modelBuilder.Entity<Appointment>().ToTable(nameof(Appointments));
+            modelBuilder.Entity<MedicalRecord>().ToTable(nameof(MedicalRecords));
         }
     }
 }
