@@ -28,7 +28,7 @@ namespace Msaasbackend.Controllers
             throw new NotImplementedException();
         }
 
-        [HttpPatch("{id:int}")]
+        [HttpPut("{id:int}")]
         public Task<IActionResult> UpdateDepartment(int id, DepartmentCreationForm form)
         {
             throw new NotImplementedException();

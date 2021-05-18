@@ -39,7 +39,7 @@ namespace MsaasBackend.Controllers
             throw new NotImplementedException();
         }
 
-        [HttpPatch]
+        [HttpPut]
         public async Task<IActionResult> UpdateHospital(HospitalCreationForm form)
         {
             throw new NotImplementedException();
