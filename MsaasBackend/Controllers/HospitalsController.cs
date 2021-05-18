@@ -27,6 +27,12 @@ namespace MsaasBackend.Controllers
             return Ok(hospitals);
         }
 
+        [HttpGet("{id:int}")]
+        public async Task<IActionResult> GetHospital(int id)
+        {
+            throw new NotImplementedException();
+        }
+
         [HttpPost]
         public async Task<IActionResult> CreateHospital(HospitalCreationForm form)
         {
@@ -34,7 +40,7 @@ namespace MsaasBackend.Controllers
         }
 
         [HttpPatch]
-        public async Task<IActionResult> ModifyHospital(HospitalCreationForm form)
+        public async Task<IActionResult> UpdateHospital(HospitalCreationForm form)
         {
             throw new NotImplementedException();
         }
