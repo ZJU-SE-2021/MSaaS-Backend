@@ -18,6 +18,7 @@ namespace MsaasBackend.Controllers
 {
     [ApiController]
     [Route("[controller]")]
+    [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
     public class UsersController : ControllerBase
     {
         private readonly ILogger<UsersController> _logger;
@@ -33,6 +34,7 @@ namespace MsaasBackend.Controllers
         }
 
         [HttpPost("Login")]
+        [AllowAnonymous]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status401Unauthorized)]
@@ -68,6 +70,7 @@ namespace MsaasBackend.Controllers
         }
 
         [HttpPost]
+        [AllowAnonymous]
         [ProducesResponseType(StatusCodes.Status201Created)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status409Conflict)]
@@ -94,7 +97,6 @@ namespace MsaasBackend.Controllers
         [HttpGet("Current")]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status401Unauthorized)]
-        [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
         public async Task<IActionResult> GetCurrentUser()
         {
             var currentId = User.FindFirst(ClaimTypes.NameIdentifier);
@@ -106,7 +108,7 @@ namespace MsaasBackend.Controllers
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         [ProducesResponseType(StatusCodes.Status403Forbidden)]
-        [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme, Roles = "Admin")]
+        [Authorize(Roles = "Admin")]
         public async Task<IActionResult> GetUser(int id)
         {
             var users = from u in _context.Users where u.Id == id select u;
@@ -118,11 +120,67 @@ namespace MsaasBackend.Controllers
         [HttpGet]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status403Forbidden)]
-        [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme, Roles = "Admin")]
+        [Authorize(Roles = "Admin")]
         public async Task<IActionResult> GetUsers()
         {
             var users = from u in _context.Users select u.ToDto();
             return Ok(users);
+        }
+
+        [HttpPut("Current")]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(StatusCodes.Status403Forbidden)]
+        public async Task<IActionResult> UpdateCurrentUser(RegisterForm form)
+        {
+            var currentId = User.FindFirst(ClaimTypes.NameIdentifier);
+            if (currentId == null) return Unauthorized();
+            var user = await _context.Users.FindAsync(currentId);
+            var formAdmin = new RegisterFormAdmin()
+            {
+                Birthday = form.Birthday,
+                Email = form.Email,
+                Gender = form.Gender,
+                Password = form.Password,
+                Phone = form.Phone,
+                Role = user.Role,
+                Username = form.Username
+            };
+
+            return await UpdateUser(user, formAdmin);
+        }
+
+        [HttpPut("{id:int}")]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(StatusCodes.Status403Forbidden)]
+        public async Task<IActionResult> UpdateUser(int id, RegisterFormAdmin form)
+        {
+            var user = await _context.Users.FindAsync(id);
+            return await UpdateUser(user, form);
+        }
+
+        private async Task<IActionResult> UpdateUser(User user, RegisterFormAdmin form)
+        {
+            if (user.Username != form.Username)
+            {
+                var users = from u in _context.Users where u.Username == form.Username select u;
+                if (await users.AnyAsync()) return Conflict();
+                user.Username = form.Username;
+            }
+
+            user.Birthday = form.Birthday;
+            user.Email = form.Email;
+            user.Gender = form.Gender;
+            user.Phone = form.Phone;
+            user.Role = form.Role;
+
+            if (form.Password != null) user.PasswordHash = BC.EnhancedHashPassword(form.Password);
+            await _context.SaveChangesAsync();
+
+            return Ok(user);
         }
     }
 }

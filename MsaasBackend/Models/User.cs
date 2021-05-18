@@ -95,4 +95,9 @@ namespace MsaasBackend.Models
 
         [EmailAddress] public string Email { get; set; }
     }
+
+    public class RegisterFormAdmin : RegisterForm
+    {
+        public string Role { get; set; } = "User";
+    }
 }
