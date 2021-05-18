@@ -32,7 +32,7 @@ namespace MsaasBackend.Controllers
             _jwtOptions = jwtOptions;
         }
 
-        [HttpPost("login")]
+        [HttpPost("Login")]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status401Unauthorized)]
@@ -81,13 +81,17 @@ namespace MsaasBackend.Controllers
             {
                 Username = form.Username,
                 PasswordHash = BC.EnhancedHashPassword(form.Password),
+                Birthday = form.Birthday,
+                Email = form.Email,
+                Gender = form.Gender,
+                Phone = form.Phone
             };
             _context.Users.Add(user);
             await _context.SaveChangesAsync();
             return CreatedAtAction(nameof(GetUser), new {Id = user.Id}, user.ToDto());
         }
 
-        [HttpGet("current")]
+        [HttpGet("Current")]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status401Unauthorized)]
         [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
@@ -98,8 +102,7 @@ namespace MsaasBackend.Controllers
             return await GetUser(Convert.ToInt32(currentId.Value));
         }
 
-        [HttpGet]
-        [Route("{id:int}")]
+        [HttpGet("{id:int}")]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         [ProducesResponseType(StatusCodes.Status403Forbidden)]
