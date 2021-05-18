@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 
 namespace MsaasBackend.Models
@@ -7,6 +8,8 @@ namespace MsaasBackend.Models
         public int Id { get; set; }
         public string Name { get; set; }
         public string Address { get; set; }
+
+        public List<Department> Departments { get; set; }
 
         public HospitalDto toDto() => new()
         {
@@ -28,12 +31,5 @@ namespace MsaasBackend.Models
         [Required] public string Name { get; set; }
 
         [Required] public string Address { get; set; }
-    }
-
-    public class Department
-    {
-        public int Id { get; set; }
-        public Hospital Hospital { get; set; }
-        public string Name { get; set; }
     }
 }

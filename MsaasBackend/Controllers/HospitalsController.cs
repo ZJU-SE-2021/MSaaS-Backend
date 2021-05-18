@@ -39,9 +39,20 @@ namespace MsaasBackend.Controllers
             throw new NotImplementedException();
         }
 
-        [HttpDelete]
-        [Route("{id}")]
+        [HttpDelete("{id:int}")]
         public async Task<IActionResult> DeleteHospital(int id)
+        {
+            throw new NotImplementedException();
+        }
+
+        [HttpGet("{id:int}/Departments")]
+        public async Task<IActionResult> GetDepartments(int id)
+        {
+            throw new NotImplementedException();
+        }
+
+        [HttpPost("{id:int}/Departments")]
+        public async Task<IActionResult> CreateDepartment(int id, DepartmentCreationForm form)
         {
             throw new NotImplementedException();
         }
