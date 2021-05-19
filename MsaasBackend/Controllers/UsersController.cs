@@ -134,6 +134,7 @@ namespace MsaasBackend.Controllers
         [ProducesResponseType(StatusCodes.Status403Forbidden)]
         public async Task<IActionResult> UpdateCurrentUser(RegisterForm form)
         {
+            if (!ModelState.IsValid) return ValidationProblem();
             var currentId = User.FindFirst(ClaimTypes.NameIdentifier);
             if (currentId == null) return Unauthorized();
             var user = await _context.Users.FindAsync(currentId);
@@ -159,6 +160,7 @@ namespace MsaasBackend.Controllers
         [Authorize(Roles = "Admin")]
         public async Task<IActionResult> UpdateUser(int id, RegisterFormAdmin form)
         {
+            if (!ModelState.IsValid) return ValidationProblem();
             var user = await _context.Users.FindAsync(id);
             return await UpdateUser(user, form);
         }
