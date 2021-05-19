@@ -124,7 +124,7 @@ namespace MsaasBackend.Controllers
         public async Task<IActionResult> GetUsers()
         {
             var users = from u in _context.Users select u.ToDto();
-            return Ok(users);
+            return Ok(await users.ToListAsync());
         }
 
         [HttpPut("Current")]
