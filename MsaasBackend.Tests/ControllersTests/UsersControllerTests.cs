@@ -1,7 +1,6 @@
 using System;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using MsaasBackend.Controllers;
@@ -9,7 +8,7 @@ using MsaasBackend.Models;
 using Xunit;
 using BC = BCrypt.Net.BCrypt;
 
-namespace MsaasBackend.Tests
+namespace MsaasBackend.Tests.ControllersTests
 {
     public class UsersControllerTests : InMemoryDataContextTests
     {

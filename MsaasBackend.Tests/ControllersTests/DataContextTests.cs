@@ -1,7 +1,7 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using MsaasBackend.Models;
 
-namespace MsaasBackend.Tests
+namespace MsaasBackend.Tests.ControllersTests
 {
     public abstract class DataContextTests
     {
