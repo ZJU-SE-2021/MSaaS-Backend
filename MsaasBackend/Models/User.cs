@@ -100,4 +100,11 @@ namespace MsaasBackend.Models
     {
         public string Role { get; set; } = "User";
     }
+
+    public class LoginResult
+    {
+        public string Token { get; set; }
+
+        public UserDto User { get; set; }
+    }
 }

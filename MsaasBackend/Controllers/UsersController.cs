@@ -62,7 +62,7 @@ namespace MsaasBackend.Controllers
                     SecurityAlgorithms.HmacSha256Signature)
             };
             var token = handler.CreateToken(tokenDesc);
-            return Ok(new
+            return Ok(new LoginResult
             {
                 Token = handler.WriteToken(token),
                 User = user.ToDto()
