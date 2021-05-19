@@ -19,7 +19,7 @@ namespace MsaasBackend.Tests.IntegrationTests
         [InlineData("PUT", "users/1")]
         public async Task General_PrivilegedApi_Forbidden(string method, string uri)
         {
-            var res = await SendAsUser(new HttpRequestMessage(new HttpMethod(method), uri));
+            var res = await SendAs(new HttpRequestMessage(new HttpMethod(method), uri), User);
             Assert.Equal(HttpStatusCode.Forbidden, res.StatusCode);
         }
     }

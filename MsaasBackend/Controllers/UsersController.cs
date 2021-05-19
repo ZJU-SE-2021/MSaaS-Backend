@@ -132,13 +132,13 @@ namespace MsaasBackend.Controllers
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status403Forbidden)]
-        public async Task<IActionResult> UpdateCurrentUser(RegisterForm form)
+        public async Task<IActionResult> UpdateCurrentUser(UpdateUserForm form)
         {
             if (!ModelState.IsValid) return ValidationProblem();
             var currentId = User.FindFirst(ClaimTypes.NameIdentifier);
             if (currentId == null) return Unauthorized();
             var user = await _context.Users.FindAsync(currentId);
-            var formAdmin = new RegisterFormAdmin()
+            var formAdmin = new UpdateUserFormAdmin()
             {
                 Birthday = form.Birthday,
                 Email = form.Email,
@@ -158,14 +158,14 @@ namespace MsaasBackend.Controllers
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status403Forbidden)]
         [Authorize(Roles = "Admin")]
-        public async Task<IActionResult> UpdateUser(int id, RegisterFormAdmin form)
+        public async Task<IActionResult> UpdateUser(int id, UpdateUserFormAdmin form)
         {
             if (!ModelState.IsValid) return ValidationProblem();
             var user = await _context.Users.FindAsync(id);
             return await UpdateUser(user, form);
         }
 
-        private async Task<IActionResult> UpdateUser(User user, RegisterFormAdmin form)
+        private async Task<IActionResult> UpdateUser(User user, UpdateUserFormAdmin form)
         {
             if (user.Username != form.Username)
             {

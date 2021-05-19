@@ -96,7 +96,22 @@ namespace MsaasBackend.Models
         [EmailAddress] public string Email { get; set; }
     }
 
-    public class RegisterFormAdmin : RegisterForm
+    public class UpdateUserForm
+    {
+        public string Username { get; set; }
+
+        public string Password { get; set; }
+
+        public Gender? Gender { get; set; }
+
+        [DataType(DataType.Date)] public DateTime? Birthday { get; set; }
+
+        [Phone] public string Phone { get; set; }
+
+        [EmailAddress] public string Email { get; set; }
+    }
+
+    public class UpdateUserFormAdmin : UpdateUserForm
     {
         public string Role { get; set; } = "User";
     }
