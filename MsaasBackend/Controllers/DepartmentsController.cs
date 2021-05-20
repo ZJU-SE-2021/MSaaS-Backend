@@ -24,12 +24,23 @@ namespace Msaasbackend.Controllers
             _context = context;
         }
 
+
+        [HttpGet]
+        public async Task<IActionResult> GetDepartments()
+        {
+            var departments = from d in _context.Departments select d.ToDto();
+            return Ok(await departments.ToListAsync());
+        }
+
+        [HttpGet("{id:int}")]
+        public async Task<IActionResult> GetDepartment(int id)
+        {
+            var department = await _context.Departments.FindAsync(id);
+            if (department == null) return NotFound();
+            return Ok(department.ToDto());
+        }
+
         [HttpDelete("{id:int}")]
-        [ProducesResponseType(StatusCodes.Status200OK)]
-        [ProducesResponseType(StatusCodes.Status404NotFound)]
-        [ProducesResponseType(StatusCodes.Status400BadRequest)]
-        [ProducesResponseType(StatusCodes.Status403Forbidden)]
-        [Authorize(Roles = "Admin")]
         public async Task<IActionResult> DeleteDepartment(int id)
         {
             var department = await _context.Departments.FindAsync(id);
@@ -39,20 +50,12 @@ namespace Msaasbackend.Controllers
             return Ok();
         }
 
-        [HttpPatch("{id:int}")]
-        [ProducesResponseType(StatusCodes.Status200OK)]
-        [ProducesResponseType(StatusCodes.Status404NotFound)]
-        [ProducesResponseType(StatusCodes.Status400BadRequest)]
-        [ProducesResponseType(StatusCodes.Status403Forbidden)]
+        [HttpPut("{id:int}")]
         public async Task<IActionResult> UpdateDepartment(int id, DepartmentCreationForm form)
         {
             if (!ModelState.IsValid) return ValidationProblem();
             var department = await _context.Departments.FindAsync(id);
-            return await UpdateDepartment(department, form);
-        }
 
-        public async Task<IActionResult> UpdateDepartment(Department department, DepartmentCreationForm form)
-        {
             if (department.Name != form.Name)
             {
                 var departments = from d in _context.Departments where d.Name == form.Name select d;
@@ -63,6 +66,33 @@ namespace Msaasbackend.Controllers
             await _context.SaveChangesAsync();
 
             return Ok(department);
+        }
+
+        [HttpPost("{id:int}")]
+        public async Task<IActionResult> CreateDepartment(int id, DepartmentCreationForm form)
+        {
+            if (!ModelState.IsValid) return ValidationProblem();
+            var hospital = await _context.Hospitals.FindAsync(id);
+            if (hospital == null) return NotFound();
+
+            var departments =
+                from d in _context.Departments
+                where d.HospitalId == id && d.Name == form.Name
+                select d;
+            if (await departments.AnyAsync()) return Conflict();
+
+            var department = new Department
+            {
+                Name = form.Name,
+                //Hospital = hospital,
+                HospitalId = id
+            };
+
+            //hospital.Departments.Add(department);
+            _context.Departments.Add(department);
+            await _context.SaveChangesAsync();
+
+            return CreatedAtAction(nameof(GetDepartment), new { Id = department.Id }, department.ToDto());
         }
     }
 }
