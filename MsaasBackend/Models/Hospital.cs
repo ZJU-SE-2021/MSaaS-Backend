@@ -11,7 +11,7 @@ namespace MsaasBackend.Models
 
         public List<Department> Departments { get; set; }
 
-        public HospitalDto toDto() => new()
+        public HospitalDto ToDto() => new()
         {
             Id = Id,
             Address = Address,
