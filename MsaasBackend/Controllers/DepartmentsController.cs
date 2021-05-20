@@ -4,6 +4,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using MsaasBackend.Models;
 
@@ -35,9 +36,21 @@ namespace Msaasbackend.Controllers
         }
 
         [HttpPost("{id:int}/Physicians")]
-        public Task<IActionResult> RegisterPhysician(int id, PhysicianRegisterForm form)
+        public async Task<IActionResult> RegisterPhysician(int id, PhysicianRegisterForm form)
         {
-            throw new NotImplementedException();
+            if (!ModelState.IsValid) return ValidationProblem();
+            var departments = from d in _context.Departments where d.Id == id select d;
+            var department = await departments.FirstOrDefaultAsync();
+            if (department == null) return NotFound();
+
+            var physicians = from u in _context.Physicians where u.Id == form.PhysicianId select u;
+            var physician = await physicians.FirstOrDefaultAsync();
+            if (physician == null) return NotFound();
+
+            physician.DepartmentId = id;
+            physician.Department = department;
+
+            return Ok(physician);
         }
     }
 }
