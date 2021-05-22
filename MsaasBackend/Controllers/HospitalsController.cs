@@ -57,8 +57,8 @@ namespace MsaasBackend.Controllers
             return CreatedAtAction(nameof(GetHospital), new { Id = hospital.Id }, hospital.ToDto());
         }
 
-        [HttpPut("{id:int}")]
-        public async Task<IActionResult> UpdateHospital(int id, HospitalCreationForm form)
+        [HttpPut]
+        public async Task<IActionResult> UpdateHospital(HospitalCreationForm form)
         {
             if (!ModelState.IsValid) return ValidationProblem();
             var hospital = await _context.Hospitals.FindAsync(id);

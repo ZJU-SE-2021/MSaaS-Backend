@@ -1,5 +1,6 @@
-﻿using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
+using System.Collections.Generic;
 
 namespace MsaasBackend.Models
 {
@@ -11,6 +12,8 @@ namespace MsaasBackend.Models
         public int HospitalId { get; set; }
 
         public Hospital Hospital { get; set; }
+
+        public List<Physician> Physicians { get; set; }
 
         public DepartmentDto ToDto() => new()
         {
@@ -31,5 +34,10 @@ namespace MsaasBackend.Models
     {
         public int HospitalId { get; set; }
         [Required] public string Name { get; set; }
+    }
+
+    public class PhysicianRegisterForm
+    {
+        public int PhysicianId { get; set; }
     }
 }
