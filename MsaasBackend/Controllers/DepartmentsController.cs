@@ -68,16 +68,16 @@ namespace Msaasbackend.Controllers
             return Ok(department);
         }
 
-        [HttpPost("{id:int}")]
-        public async Task<IActionResult> CreateDepartment(int id, DepartmentCreationForm form)
+        [HttpPost]
+        public async Task<IActionResult> CreateDepartment(DepartmentCreationForm form)
         {
             if (!ModelState.IsValid) return ValidationProblem();
-            var hospital = await _context.Hospitals.FindAsync(id);
+            var hospital = await _context.Hospitals.FindAsync(form.HospitalId);
             if (hospital == null) return NotFound();
 
             var departments =
                 from d in _context.Departments
-                where d.HospitalId == id && d.Name == form.Name
+                where d.HospitalId == form.HospitalId && d.Name == form.Name
                 select d;
             if (await departments.AnyAsync()) return Conflict();
 
@@ -85,14 +85,14 @@ namespace Msaasbackend.Controllers
             {
                 Name = form.Name,
                 //Hospital = hospital,
-                HospitalId = id
+                HospitalId = form.HospitalId
             };
 
             //hospital.Departments.Add(department);
             _context.Departments.Add(department);
             await _context.SaveChangesAsync();
 
-            return CreatedAtAction(nameof(GetDepartment), new { Id = department.Id }, department.ToDto());
+            return CreatedAtAction(nameof(GetDepartment), new {Id = department.Id}, department.ToDto());
         }
     }
 }

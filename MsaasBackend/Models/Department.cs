@@ -29,6 +29,7 @@ namespace MsaasBackend.Models
 
     public class DepartmentCreationForm
     {
+        public int HospitalId { get; set; }
         [Required] public string Name { get; set; }
     }
 }
