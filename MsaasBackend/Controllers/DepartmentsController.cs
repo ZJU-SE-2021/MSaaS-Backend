@@ -84,11 +84,9 @@ namespace Msaasbackend.Controllers
             var department = new Department
             {
                 Name = form.Name,
-                //Hospital = hospital,
                 HospitalId = form.HospitalId
             };
 
-            //hospital.Departments.Add(department);
             _context.Departments.Add(department);
             await _context.SaveChangesAsync();
 

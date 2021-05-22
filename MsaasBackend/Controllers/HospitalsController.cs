@@ -49,7 +49,6 @@ namespace MsaasBackend.Controllers
             var hospital = new Hospital
             {
                 Name = form.Name,
-                // Departments = new List<Department>(),
                 Address = form.Address,
             };
 

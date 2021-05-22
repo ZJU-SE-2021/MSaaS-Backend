@@ -10,7 +10,7 @@ namespace MsaasBackend.Models
 
         public int HospitalId { get; set; }
 
-        //public virtual Hospital Hospital { get; set; }
+        public Hospital Hospital { get; set; }
 
         public DepartmentDto ToDto() => new()
         {
