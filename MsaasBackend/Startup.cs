@@ -66,11 +66,13 @@ namespace MsaasBackend
             {
                 app.UseDeveloperExceptionPage();
             }
+
+            var baseUrl = Configuration.GetValue<string>("Subdirectory");
             
-            app.UsePathBase(Configuration.GetValue<string>("Subdirectory"));
+            app.UsePathBase(baseUrl);
 
             app.UseSwagger();
-            app.UseSwaggerUI(c => c.SwaggerEndpoint("/swagger/v1/swagger.json", "MsaasBackend v1"));
+            app.UseSwaggerUI(c => c.SwaggerEndpoint($"{baseUrl}/swagger/v1/swagger.json", "MsaasBackend v1"));
 
             if (Configuration["EnableHttps"] == "true")
             {
