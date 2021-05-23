@@ -66,6 +66,8 @@ namespace MsaasBackend
             {
                 app.UseDeveloperExceptionPage();
             }
+            
+            app.UsePathBase(Configuration.GetValue<string>("Subdirectory"));
 
             app.UseSwagger();
             app.UseSwaggerUI(c => c.SwaggerEndpoint("/swagger/v1/swagger.json", "MsaasBackend v1"));
