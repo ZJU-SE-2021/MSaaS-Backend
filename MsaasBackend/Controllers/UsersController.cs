@@ -48,26 +48,30 @@ namespace MsaasBackend.Controllers
 
             if (user == null || !BC.EnhancedVerify(form.Password, user.PasswordHash))
                 return Unauthorized();
-            
-            // construct identity
-            var identity = new ClaimsIdentity(new[]
+
+            // prepare claims
+            var claims = new[]
             {
                 new Claim(ClaimTypes.NameIdentifier, user.Id.ToString()),
                 new Claim(ClaimTypes.Name, user.Username),
                 new Claim(ClaimTypes.Role, user.Role),
-            });
+            };
 
             // sign the JWT token
             var handler = new JwtSecurityTokenHandler();
             var tokenDesc = new SecurityTokenDescriptor
             {
-                Subject = identity,
+                Subject = new ClaimsIdentity(claims),
                 Expires = DateTime.UtcNow.AddSeconds(_jwtOptions.Value.ExpiresIn),
                 SigningCredentials = new SigningCredentials(new SymmetricSecurityKey(_jwtOptions.Value.SigningKeyData),
                     SecurityAlgorithms.HmacSha256Signature)
             };
             var token = handler.CreateToken(tokenDesc);
 
+            // dispatch the cookies
+            var identity = new ClaimsIdentity(CookieAuthenticationDefaults.AuthenticationScheme,
+                ClaimTypes.Name, ClaimTypes.Role);
+            identity.AddClaims(claims);
             var principal = new ClaimsPrincipal(identity);
             await HttpContext.SignInAsync(
                 CookieAuthenticationDefaults.AuthenticationScheme,
