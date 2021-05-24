@@ -3,6 +3,8 @@ using System.IdentityModel.Tokens.Jwt;
 using System.Linq;
 using System.Security.Claims;
 using System.Threading.Tasks;
+using Microsoft.AspNetCore.Authentication;
+using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
@@ -18,7 +20,7 @@ namespace MsaasBackend.Controllers
 {
     [ApiController]
     [Route("[controller]")]
-    [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
+    [Authorize(AuthenticationSchemes = CookieAuthenticationDefaults.AuthenticationScheme + "," + JwtBearerDefaults.AuthenticationScheme)]
     public class UsersController : ControllerBase
     {
         private readonly ILogger<UsersController> _logger;
@@ -46,22 +48,36 @@ namespace MsaasBackend.Controllers
 
             if (user == null || !BC.EnhancedVerify(form.Password, user.PasswordHash))
                 return Unauthorized();
+            
+            // construct identity
+            var identity = new ClaimsIdentity(new[]
+            {
+                new Claim(ClaimTypes.NameIdentifier, user.Id.ToString()),
+                new Claim(ClaimTypes.Name, user.Username),
+                new Claim(ClaimTypes.Role, user.Role),
+            });
 
             // sign the JWT token
             var handler = new JwtSecurityTokenHandler();
             var tokenDesc = new SecurityTokenDescriptor
             {
-                Subject = new ClaimsIdentity(new[]
-                {
-                    new Claim(ClaimTypes.NameIdentifier, user.Id.ToString()),
-                    new Claim(ClaimTypes.Name, user.Username),
-                    new Claim(ClaimTypes.Role, user.Role),
-                }),
+                Subject = identity,
                 Expires = DateTime.UtcNow.AddSeconds(_jwtOptions.Value.ExpiresIn),
                 SigningCredentials = new SigningCredentials(new SymmetricSecurityKey(_jwtOptions.Value.SigningKeyData),
                     SecurityAlgorithms.HmacSha256Signature)
             };
             var token = handler.CreateToken(tokenDesc);
+
+            var principal = new ClaimsPrincipal(identity);
+            await HttpContext.SignInAsync(
+                CookieAuthenticationDefaults.AuthenticationScheme,
+                principal,
+                new AuthenticationProperties
+                {
+                    IsPersistent = false,
+                    ExpiresUtc = DateTimeOffset.UtcNow.AddSeconds(_jwtOptions.Value.ExpiresIn)
+                });
+            
             return Ok(new LoginResult
             {
                 Token = handler.WriteToken(token),
