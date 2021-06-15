@@ -52,26 +52,5 @@ namespace MsaasBackend.Controllers
             await _context.SaveChangesAsync();
             return CreatedAtAction(nameof(AddAppointment), new {Id = appointment.Id}, appointment);
         }
-
-        [HttpPost("{id:int}/MedicalRecord")]
-        public async Task<IActionResult> AddMedicalRecord(int id, MedicalRecordForm form)
-        {
-            if (!ModelState.IsValid) return ValidationProblem();
-            var appointments = from a in _context.Appointments where a.Id == id select a;
-            var appointment = await appointments.FirstOrDefaultAsync();
-            if (appointment == null) return NotFound();
-
-            var medicalRecord = new MedicalRecord
-            {
-                AppointmentId = id,
-                Appointment = appointment,
-                Symptom = form.Symptom,
-                PastMedicalHistory = form.Symptom,
-                Diagnosis = form.Diagnosis
-            };
-            _context.MedicalRecords.Add(medicalRecord);
-            await _context.SaveChangesAsync();
-            return CreatedAtAction(nameof(AddMedicalRecord), new {Id = medicalRecord.Id}, medicalRecord);
-        }
     }
 }
