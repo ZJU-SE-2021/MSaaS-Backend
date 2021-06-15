@@ -27,6 +27,8 @@ namespace MsaasBackend
             Configuration = configuration;
         }
 
+        private const string ClientWebAllowSpecificOrigins = "clientWebAllowSpecificOrigins";
+
         public IConfiguration Configuration { get; }
 
         // This method gets called by the runtime. Use this method to add services to the container.
@@ -34,6 +36,15 @@ namespace MsaasBackend
         {
             services.Configure<JwtOptions>(Configuration.GetSection("JwtSettings"));
             services.AddDbContext<DataContext>(opt => opt.UseNpgsql(Configuration.GetConnectionString("Msaas")));
+            
+            services.AddCors(options =>
+            {
+                options.AddPolicy(name: ClientWebAllowSpecificOrigins,
+                    builder =>
+                    {
+                        builder.WithOrigins("https://client_msaas.app.ncj.wiki/");
+                    });
+            });
 
             services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
                 .AddJwtBearer(JwtBearerDefaults.AuthenticationScheme,
@@ -67,7 +78,7 @@ namespace MsaasBackend
                 app.UseDeveloperExceptionPage();
             }
 
-            var baseUrl = Configuration.GetValue<string>("Subdirectory");
+            var baseUrl = Configuration.GetValue<string>("SubDirectory");
             
             app.UsePathBase(baseUrl);
 
@@ -80,6 +91,8 @@ namespace MsaasBackend
             }
 
             app.UseRouting();
+            
+            app.UseCors(ClientWebAllowSpecificOrigins);
 
             app.UseAuthorization();
 
