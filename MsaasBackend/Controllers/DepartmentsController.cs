@@ -26,6 +26,7 @@ namespace Msaasbackend.Controllers
 
 
         [HttpGet]
+        [ProducesResponseType(typeof(IEnumerable<DepartmentDto>), StatusCodes.Status200OK)]
         public async Task<IActionResult> GetDepartments()
         {
             var departments = from d in _context.Departments select d.ToDto();
@@ -33,6 +34,7 @@ namespace Msaasbackend.Controllers
         }
 
         [HttpGet("{id:int}")]
+        [ProducesResponseType(typeof(DepartmentDto), StatusCodes.Status200OK)]
         public async Task<IActionResult> GetDepartment(int id)
         {
             var department = await _context.Departments.FindAsync(id);
@@ -41,6 +43,7 @@ namespace Msaasbackend.Controllers
         }
 
         [HttpDelete("{id:int}")]
+        [ProducesResponseType(StatusCodes.Status200OK)]
         public async Task<IActionResult> DeleteDepartment(int id)
         {
             var department = await _context.Departments.FindAsync(id);
@@ -51,6 +54,7 @@ namespace Msaasbackend.Controllers
         }
 
         [HttpPut("{id:int}")]
+        [ProducesResponseType(typeof(DepartmentDto), StatusCodes.Status200OK)]
         public async Task<IActionResult> UpdateDepartment(int id, DepartmentCreationForm form)
         {
             if (!ModelState.IsValid) return ValidationProblem();
@@ -69,6 +73,7 @@ namespace Msaasbackend.Controllers
         }
 
         [HttpPost]
+        [ProducesResponseType(typeof(DepartmentDto), StatusCodes.Status201Created)]
         public async Task<IActionResult> CreateDepartment(DepartmentCreationForm form)
         {
             if (!ModelState.IsValid) return ValidationProblem();

@@ -25,6 +25,7 @@ namespace MsaasBackend.Controllers
         }
 
         [HttpGet]
+        [ProducesResponseType(typeof(IEnumerable<HospitalDto>), StatusCodes.Status200OK)]
         public async Task<IActionResult> GetHospitals()
         {
             var hospitals = from h in _context.Hospitals select h.ToDto();
@@ -32,6 +33,7 @@ namespace MsaasBackend.Controllers
         }
 
         [HttpGet("{id:int}")]
+        [ProducesResponseType(typeof(HospitalDto), StatusCodes.Status200OK)]
         public async Task<IActionResult> GetHospital(int id)
         {
             var hospital = await _context.Hospitals.FindAsync(id);
@@ -40,6 +42,7 @@ namespace MsaasBackend.Controllers
         }
 
         [HttpPost]
+        [ProducesResponseType(typeof(HospitalDto), StatusCodes.Status201Created)]
         public async Task<IActionResult> CreateHospital(HospitalCreationForm form)
         {
             if (!ModelState.IsValid) return ValidationProblem();
@@ -54,10 +57,11 @@ namespace MsaasBackend.Controllers
 
             _context.Hospitals.Add(hospital);
             await _context.SaveChangesAsync();
-            return CreatedAtAction(nameof(GetHospital), new { Id = hospital.Id }, hospital.ToDto());
+            return CreatedAtAction(nameof(GetHospital), new {Id = hospital.Id}, hospital.ToDto());
         }
 
         [HttpPut("{id:int}")]
+        [ProducesResponseType(typeof(HospitalDto), StatusCodes.Status200OK)]
         public async Task<IActionResult> UpdateHospital(int id, HospitalCreationForm form)
         {
             if (!ModelState.IsValid) return ValidationProblem();
@@ -76,6 +80,7 @@ namespace MsaasBackend.Controllers
         }
 
         [HttpDelete("{id:int}")]
+        [ProducesResponseType(StatusCodes.Status200OK)]
         public async Task<IActionResult> DeleteHospital(int id)
         {
             var hospital = await _context.Hospitals.FindAsync(id);

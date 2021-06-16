@@ -3,6 +3,7 @@ using System.Linq;
 using System.Security.Claims;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
@@ -26,20 +27,21 @@ namespace MsaasBackend.Controllers
         }
 
         [HttpPost]
+        [ProducesResponseType(typeof(Appointment), StatusCodes.Status201Created)]
         public async Task<IActionResult> AddAppointment(AppointmentForm form)
         {
             if (!ModelState.IsValid) return ValidationProblem();
             var currentId = User.FindFirst(ClaimTypes.NameIdentifier);
             if (currentId == null) return Unauthorized();
-            
+
             var users = from u in _context.Users where u.Id == Convert.ToInt32(currentId.Value) select u;
             var user = await users.FirstOrDefaultAsync();
             if (user == null) return NotFound();
-            
+
             var physicians = from u in _context.Physicians where u.Id == form.PhysicianId select u;
             var physician = await physicians.FirstOrDefaultAsync();
             if (physician == null) return NotFound();
-            
+
             var appointment = new Appointment
             {
                 UserId = user.Id,
