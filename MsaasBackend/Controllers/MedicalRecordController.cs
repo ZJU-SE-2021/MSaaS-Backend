@@ -4,6 +4,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using MsaasBackend.Models;
 using System.Linq;
+using Microsoft.AspNetCore.Http;
 using Microsoft.EntityFrameworkCore;
 
 namespace MsaasBackend.Controllers
@@ -22,6 +23,7 @@ namespace MsaasBackend.Controllers
         }
 
         [HttpPost]
+        [ProducesResponseType(typeof(MedicalRecord), StatusCodes.Status201Created)]
         public async Task<IActionResult> AddMedicalRecord(MedicalRecordForm form)
         {
             if (!ModelState.IsValid) return ValidationProblem();

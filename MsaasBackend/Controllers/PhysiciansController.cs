@@ -1,5 +1,6 @@
 using System.Linq;
 using System.Threading.Tasks;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
@@ -21,6 +22,7 @@ namespace MsaasBackend.Controllers
         }
 
         [HttpPost]
+        [ProducesResponseType(typeof(Physician), StatusCodes.Status200OK)]
         public async Task<IActionResult> RegisterPhysician(int id, PhysicianRegisterForm form)
         {
             if (!ModelState.IsValid) return ValidationProblem();

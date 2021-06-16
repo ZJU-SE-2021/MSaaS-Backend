@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Reflection;
 using System.Text;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authentication.Cookies;
@@ -18,6 +19,7 @@ using Microsoft.Extensions.Logging;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
 using MsaasBackend.Models;
+using Swashbuckle.AspNetCore.SwaggerGen;
 
 namespace MsaasBackend
 {
@@ -65,6 +67,8 @@ namespace MsaasBackend
             services.AddSwaggerGen(c =>
             {
                 c.SwaggerDoc("v1", new OpenApiInfo {Title = "MsaasBackend", Version = "v1"});
+                c.CustomOperationIds(apiDesc =>
+                    apiDesc.TryGetMethodInfo(out var methodInfo) ? methodInfo.Name : null);
             });
         }
 
