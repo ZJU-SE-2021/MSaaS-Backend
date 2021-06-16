@@ -7,7 +7,6 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
-using Msaasbackend.Controllers;
 using MsaasBackend.Models;
 
 namespace MsaasBackend.Controllers
