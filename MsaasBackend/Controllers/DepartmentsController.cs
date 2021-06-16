@@ -9,7 +9,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using MsaasBackend.Models;
 
-namespace Msaasbackend.Controllers
+namespace MsaasBackend.Controllers
 {
     [Route("[controller]")]
     [ApiController]

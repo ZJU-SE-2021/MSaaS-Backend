@@ -28,6 +28,13 @@ namespace MsaasBackend.Tests.IntegrationTests
                 Role = "Admin"
             };
             db.Users.AddRange(user, admin);
+
+            for (var i = 1; i <= 4; ++i)
+            {
+                db.Hospitals.Add(new Hospital() {Name = $"hospital {i}"});
+                db.Departments.Add(new Department {HospitalId = 1, Name = $"department {i}"});
+            }
+
             db.SaveChanges();
         }
 
