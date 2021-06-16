@@ -38,6 +38,8 @@ namespace MsaasBackend.Models
 
     public class PhysicianRegisterForm
     {
+        public int HospitalId { get; set; }
+
         public int PhysicianId { get; set; }
     }
 }

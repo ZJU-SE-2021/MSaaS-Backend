@@ -13,9 +13,11 @@ namespace MsaasBackend.Models
 
         public string Diagnosis { get; set; }
     }
-    
+
     public class MedicalRecordForm
     {
+        public int AppointmentId { get; set; }
+
         public string Symptom { get; set; }
 
         public string PastMedicalHistory { get; set; }

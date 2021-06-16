@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -36,14 +37,11 @@ namespace MsaasBackend
         {
             services.Configure<JwtOptions>(Configuration.GetSection("JwtSettings"));
             services.AddDbContext<DataContext>(opt => opt.UseNpgsql(Configuration.GetConnectionString("Msaas")));
-            
+
             services.AddCors(options =>
             {
                 options.AddPolicy(name: ClientWebAllowSpecificOrigins,
-                    builder =>
-                    {
-                        builder.WithOrigins("https://client_msaas.app.ncj.wiki/");
-                    });
+                    builder => { builder.WithOrigins("https://client_msaas.app.ncj.wiki/"); });
             });
 
             services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
@@ -79,11 +77,11 @@ namespace MsaasBackend
             }
 
             var baseUrl = Configuration.GetValue<string>("SubDirectory");
-            
+
             app.UsePathBase(baseUrl);
 
             app.UseSwagger();
-            app.UseSwaggerUI(c => c.SwaggerEndpoint($"{baseUrl}/swagger/v1/swagger.json", "MsaasBackend v1"));
+            app.UseSwaggerUI(c => c.SwaggerEndpoint(Path.Join(baseUrl, "swagger/v1/swagger.json"), "MsaasBackend v1"));
 
             if (Configuration["EnableHttps"] == "true")
             {
@@ -91,7 +89,7 @@ namespace MsaasBackend
             }
 
             app.UseRouting();
-            
+
             app.UseCors(ClientWebAllowSpecificOrigins);
 
             app.UseAuthorization();
