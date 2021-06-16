@@ -29,27 +29,12 @@ namespace MsaasBackend.Tests.IntegrationTests
             };
             db.Users.AddRange(user, admin);
 
-            var hospital1 = new Hospital()
+            for (var i = 1; i <= 4; ++i)
             {
-                Name = "hospital 1"
-            };
+                db.Hospitals.Add(new Hospital() {Name = $"hospital {i}"});
+                db.Departments.Add(new Department {HospitalId = 1, Name = $"department {i}"});
+            }
 
-            var hospital2 = new Hospital()
-            {
-                Name = "hospital 2"
-            };
-
-            var hospital3 = new Hospital()
-            {
-                Name = "hospital 3"
-            };
-
-            var hospital4 = new Hospital()
-            {
-                Name = "hospital 4"
-            };
-
-            db.Hospitals.AddRange(hospital1, hospital2, hospital3, hospital4);
             db.SaveChanges();
         }
 

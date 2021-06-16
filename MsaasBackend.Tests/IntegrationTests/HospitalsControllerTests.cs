@@ -17,7 +17,7 @@ namespace MsaasBackend.Tests.IntegrationTests
         [Fact]
         public async Task GetHospitals_ValidIdentity_Success()
         {
-            var res = await GetAs("/hospitals", Admin);
+            var res = await GetAs("/hospitals");
             res.EnsureSuccessStatusCode();
             var hospitals = await res.Content.ReadFromJsonAsync<ICollection<HospitalDto>>();
             Assert.NotNull(hospitals);
@@ -27,7 +27,7 @@ namespace MsaasBackend.Tests.IntegrationTests
         [Fact]
         public async Task GetHospitalById_ValidIdentity_Success()
         {
-            var res = await GetAs("/hospitals/1", Admin);
+            var res = await GetAs("/hospitals/1");
             res.EnsureSuccessStatusCode();
             var hospital = await res.Content.ReadFromJsonAsync<HospitalDto>();
             Assert.Equal("hospital 1", hospital?.Name);
