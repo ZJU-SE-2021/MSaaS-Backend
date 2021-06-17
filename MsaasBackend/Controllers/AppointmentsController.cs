@@ -37,7 +37,7 @@ namespace MsaasBackend.Controllers
             var user = await users.FirstOrDefaultAsync();
             if (user == null) return NotFound();
 
-            var physicians = from u in _context.Physicians where u.Id == form.PhysicianId select u;
+            var physicians = from u in _context.Physicians where u.UserId == form.PhysicianId select u;
             var physician = await physicians.FirstOrDefaultAsync();
             if (physician == null) return NotFound();
 

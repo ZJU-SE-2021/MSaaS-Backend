@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http;
@@ -21,23 +22,57 @@ namespace MsaasBackend.Controllers
             _context = context;
         }
 
+        [HttpGet]
+        [ProducesResponseType(typeof(IEnumerable<PhysicianDto>), StatusCodes.Status200OK)]
+        public async Task<IActionResult> GetPhysicians()
+        {
+            return Ok(await _context.Physicians.ToListAsync());
+        }
+
+        [HttpGet("{id:int}")]
+        [ProducesResponseType(typeof(PhysicianDto), StatusCodes.Status200OK)]
+        public async Task<IActionResult> GetPhysicianById(int id)
+        {
+            var physicians = from u in _context.Physicians where u.UserId == id select u;
+            var physician = await physicians.FirstOrDefaultAsync();
+            if (physician == null) return NotFound();
+            return Ok(physician.ToDto());
+        }
+        
+        [HttpDelete("{id:int}")]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        public async Task<IActionResult> DeletePhysician(int id)
+        {
+            var physician = await _context.Physicians.FindAsync(id);
+            if (physician == null) return NotFound();
+            _context.Physicians.Remove(physician);
+            await _context.SaveChangesAsync();
+            return Ok();
+        }
+
         [HttpPost]
-        [ProducesResponseType(typeof(Physician), StatusCodes.Status200OK)]
-        public async Task<IActionResult> RegisterPhysician(int id, PhysicianRegisterForm form)
+        [ProducesResponseType(typeof(PhysicianDto), StatusCodes.Status201Created)]
+        public async Task<IActionResult> RegisterPhysician(PhysicianRegisterForm form)
         {
             if (!ModelState.IsValid) return ValidationProblem();
-            var departments = from d in _context.Departments where d.Id == id select d;
+            var departments = from d in _context.Departments where d.Id == form.DepartmentId select d;
             var department = await departments.FirstOrDefaultAsync();
             if (department == null) return NotFound();
 
-            var physicians = from u in _context.Physicians where u.Id == form.PhysicianId select u;
-            var physician = await physicians.FirstOrDefaultAsync();
-            if (physician == null) return NotFound();
+            var user = await _context.Users.FindAsync(form.UserId);
+            if (user == null) return NotFound();
 
-            physician.DepartmentId = id;
-            physician.Department = department;
+            user.Role = "Physician";
+            var physician = new Physician()
+            {
+                DepartmentId = form.DepartmentId,
+                UserId = form.UserId
+            };
+            _context.Physicians.Add(physician);
 
-            return Ok(physician);
+            await _context.SaveChangesAsync();
+
+            return CreatedAtAction(nameof(GetPhysicianById), new {Id = form.UserId}, physician.ToDto());
         }
     }
 }
