@@ -48,6 +48,8 @@ namespace MsaasBackend.Tests.IntegrationTests
                 };
                 db.Users.Add(phyUser);
                 db.Physicians.Add(new Physician() {DepartmentId = 1, User = phyUser});
+                
+                db.Appointments.Add(new Appointment() {PhysicianId = 3, UserId = 1});
             }
 
             db.Users.Add(new User()
@@ -56,7 +58,8 @@ namespace MsaasBackend.Tests.IntegrationTests
                 PasswordHash = BC.EnhancedHashPassword("physician password"),
             });
 
-            db.Appointments.Add(new Appointment() {PhysicianId = 3, UserId = 1});
+            
+            db.MedicalRecords.Add(new MedicalRecord() {AppointmentId = 1});
             db.SaveChanges();
         }
 
