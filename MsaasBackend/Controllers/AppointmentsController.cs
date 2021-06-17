@@ -2,6 +2,8 @@ using System;
 using System.Linq;
 using System.Security.Claims;
 using System.Threading.Tasks;
+using Microsoft.AspNetCore.Authentication.Cookies;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
@@ -11,7 +13,8 @@ using MsaasBackend.Models;
 
 namespace MsaasBackend.Controllers
 {
-    [Authorize]
+    [Authorize(AuthenticationSchemes =
+        CookieAuthenticationDefaults.AuthenticationScheme + "," + JwtBearerDefaults.AuthenticationScheme)]
     [Route("[controller]")]
     [ApiController]
     public class AppointmentsController : ControllerBase
@@ -25,8 +28,23 @@ namespace MsaasBackend.Controllers
             _context = context;
         }
 
+        [HttpGet("{id:int}")]
+        [ProducesResponseType(typeof(DepartmentDto), StatusCodes.Status200OK)]
+        public async Task<IActionResult> GetAppointmentById(int id)
+        {
+            var appointment = await _context.Appointments.FindAsync(id);
+            if (appointment == null) return NotFound();
+
+            var claim = User.FindFirst(ClaimTypes.NameIdentifier);
+            if (claim == null) return Unauthorized();
+            var userId = Convert.ToInt32(claim.Value);
+            if (appointment.UserId != userId && appointment.PhysicianId != userId) return Forbid();
+
+            return Ok(appointment.ToDto());
+        }
+
         [HttpPost]
-        [ProducesResponseType(typeof(Appointment), StatusCodes.Status201Created)]
+        [ProducesResponseType(typeof(AppointmentDto), StatusCodes.Status201Created)]
         public async Task<IActionResult> AddAppointment(AppointmentForm form)
         {
             if (!ModelState.IsValid) return ValidationProblem();
@@ -37,7 +55,7 @@ namespace MsaasBackend.Controllers
             var user = await users.FirstOrDefaultAsync();
             if (user == null) return NotFound();
 
-            var physicians = from u in _context.Physicians where u.Id == form.PhysicianId select u;
+            var physicians = from u in _context.Physicians where u.UserId == form.PhysicianId select u;
             var physician = await physicians.FirstOrDefaultAsync();
             if (physician == null) return NotFound();
 
@@ -51,7 +69,7 @@ namespace MsaasBackend.Controllers
             };
             _context.Appointments.Add(appointment);
             await _context.SaveChangesAsync();
-            return CreatedAtAction(nameof(AddAppointment), new {Id = appointment.Id}, appointment);
+            return CreatedAtAction(nameof(GetAppointmentById), new {Id = appointment.Id}, appointment.ToDto());
         }
     }
 }

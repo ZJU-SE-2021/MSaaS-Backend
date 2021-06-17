@@ -35,11 +35,4 @@ namespace MsaasBackend.Models
         public int HospitalId { get; set; }
         [Required] public string Name { get; set; }
     }
-
-    public class PhysicianRegisterForm
-    {
-        public int HospitalId { get; set; }
-
-        public int PhysicianId { get; set; }
-    }
 }
