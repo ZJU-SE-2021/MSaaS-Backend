@@ -27,14 +27,35 @@ namespace MsaasBackend.Tests.IntegrationTests
                 PasswordHash = BC.EnhancedHashPassword("admin password"),
                 Role = "Admin"
             };
+            var physician = new User()
+            {
+                Username = "physician",
+                PasswordHash = BC.EnhancedHashPassword("physician password"),
+                Role = "Physician"
+            };
             db.Users.AddRange(user, admin);
 
             for (var i = 1; i <= 4; ++i)
             {
                 db.Hospitals.Add(new Hospital() {Name = $"hospital {i}"});
                 db.Departments.Add(new Department {HospitalId = 1, Name = $"department {i}"});
+
+                var phyUser = new User
+                {
+                    Username = $"physician {i}",
+                    PasswordHash = BC.EnhancedHashPassword("physician password"),
+                    Role = "Physician"
+                };
+                db.Users.Add(phyUser);
+                db.Physicians.Add(new Physician() {DepartmentId = 1, User = phyUser});
             }
 
+            db.Users.Add(new User()
+            {
+                Username = $"physician 5",
+                PasswordHash = BC.EnhancedHashPassword("physician password"),
+            });
+            
             db.SaveChanges();
         }
 
