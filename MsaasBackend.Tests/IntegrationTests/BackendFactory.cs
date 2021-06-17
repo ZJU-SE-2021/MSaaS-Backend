@@ -52,10 +52,11 @@ namespace MsaasBackend.Tests.IntegrationTests
 
             db.Users.Add(new User()
             {
-                Username = $"physician 5",
+                Username = "physician 5",
                 PasswordHash = BC.EnhancedHashPassword("physician password"),
             });
-            
+
+            db.Appointments.Add(new Appointment() {PhysicianId = 3, UserId = 1});
             db.SaveChanges();
         }
 
