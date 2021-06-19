@@ -48,6 +48,7 @@ namespace MsaasBackend.Controllers
 
         [HttpPost]
         [ProducesResponseType(typeof(MedicalRecordDto), StatusCodes.Status201Created)]
+        [Authorize(Roles = "Physician")]
         public async Task<IActionResult> AddMedicalRecord(MedicalRecordForm form)
         {
             if (!ModelState.IsValid) return ValidationProblem();

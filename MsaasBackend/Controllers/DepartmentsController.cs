@@ -1,6 +1,9 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using Microsoft.AspNetCore.Authentication.Cookies;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
@@ -9,6 +12,8 @@ using MsaasBackend.Models;
 
 namespace MsaasBackend.Controllers
 {
+    [Authorize(AuthenticationSchemes =
+        CookieAuthenticationDefaults.AuthenticationScheme + "," + JwtBearerDefaults.AuthenticationScheme)]
     [Route("[controller]")]
     [ApiController]
     public class DepartmentsController : ControllerBase
@@ -41,6 +46,7 @@ namespace MsaasBackend.Controllers
 
         [HttpDelete("{id:int}")]
         [ProducesResponseType(StatusCodes.Status200OK)]
+        [Authorize(Roles = "Admin")]
         public async Task<IActionResult> DeleteDepartment(int id)
         {
             var department = await _context.Departments.FindAsync(id);
@@ -52,6 +58,7 @@ namespace MsaasBackend.Controllers
 
         [HttpPut("{id:int}")]
         [ProducesResponseType(typeof(DepartmentDto), StatusCodes.Status200OK)]
+        [Authorize(Roles = "Admin")]
         public async Task<IActionResult> UpdateDepartment(int id, DepartmentCreationForm form)
         {
             if (!ModelState.IsValid) return ValidationProblem();
@@ -73,6 +80,7 @@ namespace MsaasBackend.Controllers
 
         [HttpPost]
         [ProducesResponseType(typeof(DepartmentDto), StatusCodes.Status201Created)]
+        [Authorize(Roles = "Admin")]
         public async Task<IActionResult> CreateDepartment(DepartmentCreationForm form)
         {
             if (!ModelState.IsValid) return ValidationProblem();
