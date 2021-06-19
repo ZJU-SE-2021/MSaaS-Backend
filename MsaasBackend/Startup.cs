@@ -71,9 +71,10 @@ namespace MsaasBackend
                     apiDesc.TryGetMethodInfo(out var methodInfo) ? methodInfo.Name : null);
                 c.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme {
                     In = ParameterLocation.Header, 
-                    Description = "Please insert JWT with Bearer into field",
+                    Description = "JWT authorization using the Bearer scheme.",
                     Name = "Authorization",
-                    Type = SecuritySchemeType.ApiKey
+                    Type = SecuritySchemeType.Http,
+                    Scheme = "Bearer"
                 });
                 c.AddSecurityRequirement(new OpenApiSecurityRequirement {
                     {
@@ -83,7 +84,8 @@ namespace MsaasBackend
                             {
                                 Type = ReferenceType.SecurityScheme,
                                 Id = "Bearer"
-                            }
+                            },
+                            Name = "Bearer",
                         },
                         new string[] { }
                     }
