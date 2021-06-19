@@ -45,6 +45,7 @@ namespace MsaasBackend.Models
         {
             Id = Id,
             Username = Username,
+            Name = Name,
             Birthday = Birthday,
             Email = Email,
             Gender = Gender,
