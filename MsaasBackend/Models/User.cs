@@ -22,6 +22,8 @@ namespace MsaasBackend.Models
 
         public string Role { get; set; } = "User";
 
+        public string Name { get; set; }
+
         public Gender? Gender { get; set; }
 
         public DateTime? Birthday { get; set; }
@@ -56,6 +58,8 @@ namespace MsaasBackend.Models
 
         public string Username { get; set; }
 
+        public string Name { get; set; }
+
         public Gender? Gender { get; set; }
 
         [DataType(DataType.Date)] public DateTime? Birthday { get; set; }
@@ -87,6 +91,8 @@ namespace MsaasBackend.Models
 
         [Required] public string Password { get; set; }
 
+        public string Name { get; set; }
+
         public Gender? Gender { get; set; }
 
         [DataType(DataType.Date)] public DateTime? Birthday { get; set; }
@@ -101,6 +107,8 @@ namespace MsaasBackend.Models
         public string Username { get; set; }
 
         public string Password { get; set; }
+
+        public string Name { get; set; }
 
         public Gender? Gender { get; set; }
 

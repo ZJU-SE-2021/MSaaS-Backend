@@ -106,6 +106,7 @@ namespace MsaasBackend.Controllers
             {
                 Username = form.Username,
                 PasswordHash = BC.EnhancedHashPassword(form.Password),
+                Name = form.Name,
                 Birthday = form.Birthday,
                 Email = form.Email,
                 Gender = form.Gender,
@@ -162,6 +163,7 @@ namespace MsaasBackend.Controllers
             var user = await _context.Users.FindAsync(currentId);
             var formAdmin = new UpdateUserFormAdmin()
             {
+                Name = form.Name,
                 Birthday = form.Birthday,
                 Email = form.Email,
                 Gender = form.Gender,
@@ -196,6 +198,7 @@ namespace MsaasBackend.Controllers
                 user.Username = form.Username;
             }
 
+            user.Name = form.Name;
             user.Birthday = form.Birthday;
             user.Email = form.Email;
             user.Gender = form.Gender;
