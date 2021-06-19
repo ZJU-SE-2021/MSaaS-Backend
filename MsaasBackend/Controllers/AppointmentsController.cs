@@ -38,7 +38,7 @@ namespace MsaasBackend.Controllers
             var claim = User.FindFirst(ClaimTypes.NameIdentifier);
             if (claim == null) return Unauthorized();
             var userId = Convert.ToInt32(claim.Value);
-            if (appointment.UserId != userId && appointment.PhysicianId != userId) return Forbid();
+            if (appointment.UserId != userId && appointment.Physician.UserId != userId) return Forbid();
 
             return Ok(appointment.ToDto());
         }
@@ -55,7 +55,7 @@ namespace MsaasBackend.Controllers
             var user = await users.FirstOrDefaultAsync();
             if (user == null) return NotFound();
 
-            var physicians = from u in _context.Physicians where u.UserId == form.PhysicianId select u;
+            var physicians = from u in _context.Physicians where u.Id == form.PhysicianId select u;
             var physician = await physicians.FirstOrDefaultAsync();
             if (physician == null) return NotFound();
 

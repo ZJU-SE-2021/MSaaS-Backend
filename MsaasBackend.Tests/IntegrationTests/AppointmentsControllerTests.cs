@@ -29,7 +29,7 @@ namespace MsaasBackend.Tests.IntegrationTests
         {
             var form = new AppointmentForm
             {
-                PhysicianId = 3,
+                PhysicianId = 1,
                 Time = DateTime.Now
             };
 
