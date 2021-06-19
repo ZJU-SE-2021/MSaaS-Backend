@@ -42,7 +42,7 @@ namespace MsaasBackend.Controllers
         [ProducesResponseType(typeof(PhysicianDto), StatusCodes.Status200OK)]
         public async Task<IActionResult> GetPhysicianById(int id)
         {
-            var physicians = from u in _context.Physicians where u.UserId == id select u;
+            var physicians = from u in _context.Physicians where u.Id == id select u;
             var physician = await physicians.FirstOrDefaultAsync();
             if (physician == null) return NotFound();
             return Ok(physician.ToDto());
@@ -83,7 +83,7 @@ namespace MsaasBackend.Controllers
 
             await _context.SaveChangesAsync();
 
-            return CreatedAtAction(nameof(GetPhysicianById), new {Id = form.UserId}, physician.ToDto());
+            return CreatedAtAction(nameof(GetPhysicianById), new {Id = physician.Id}, physician.ToDto());
         }
     }
 }
