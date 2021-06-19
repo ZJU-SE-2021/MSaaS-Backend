@@ -29,9 +29,12 @@ namespace MsaasBackend.Controllers
 
         [HttpGet]
         [ProducesResponseType(typeof(IEnumerable<DepartmentDto>), StatusCodes.Status200OK)]
-        public async Task<IActionResult> GetDepartments()
+        public async Task<IActionResult> GetDepartments(int? hospitalId)
         {
-            var departments = from d in _context.Departments select d.ToDto();
+            var departments =
+                from d in _context.Departments 
+                where !hospitalId.HasValue || d.HospitalId == hospitalId
+                select d.ToDto();
             return Ok(await departments.ToListAsync());
         }
 

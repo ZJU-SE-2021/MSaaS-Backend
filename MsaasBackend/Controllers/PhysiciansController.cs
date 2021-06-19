@@ -29,9 +29,13 @@ namespace MsaasBackend.Controllers
 
         [HttpGet]
         [ProducesResponseType(typeof(IEnumerable<PhysicianDto>), StatusCodes.Status200OK)]
-        public async Task<IActionResult> GetPhysicians()
+        public async Task<IActionResult> GetPhysicians(int? departmentId)
         {
-            return Ok(await _context.Physicians.ToListAsync());
+            var res =
+                from p in _context.Physicians
+                where !departmentId.HasValue || p.DepartmentId == departmentId
+                select p.ToDto();
+            return Ok(await res.ToListAsync());
         }
 
         [HttpGet("{id:int}")]
@@ -43,7 +47,7 @@ namespace MsaasBackend.Controllers
             if (physician == null) return NotFound();
             return Ok(physician.ToDto());
         }
-        
+
         [HttpDelete("{id:int}")]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [Authorize(Roles = "Admin")]
