@@ -62,10 +62,9 @@ namespace MsaasBackend.Controllers
             var appointment = new Appointment
             {
                 UserId = user.Id,
-                User = user,
                 PhysicianId = form.PhysicianId,
-                Physician = physician,
-                Description = form.Description
+                Description = form.Description,
+                Time = form.Time
             };
             _context.Appointments.Add(appointment);
             await _context.SaveChangesAsync();

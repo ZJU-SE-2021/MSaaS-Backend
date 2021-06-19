@@ -12,6 +12,8 @@ namespace MsaasBackend.Models
         public int PhysicianId { get; set; }
         public Physician Physician { get; set; }
 
+        public DateTime Time { get; set; }
+
         public string Description { get; set; }
 
         public AppointmentDto ToDto() => new()
@@ -19,6 +21,7 @@ namespace MsaasBackend.Models
             Id = Id,
             UserId = UserId,
             Physician = Physician,
+            Time = Time,
             Description = Description
         };
     }
@@ -35,6 +38,7 @@ namespace MsaasBackend.Models
         public int Id { get; set; }
         public int UserId { get; set; }
         public Physician Physician { get; set; }
+        public DateTime Time { get; set; }
         public string Description { get; set; }
     }
 }
