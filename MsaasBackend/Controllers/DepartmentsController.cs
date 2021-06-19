@@ -1,8 +1,6 @@
-using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
@@ -23,7 +21,6 @@ namespace MsaasBackend.Controllers
             _logger = logger;
             _context = context;
         }
-
 
         [HttpGet]
         [ProducesResponseType(typeof(IEnumerable<DepartmentDto>), StatusCodes.Status200OK)]
@@ -67,6 +64,8 @@ namespace MsaasBackend.Controllers
                 department.Name = form.Name;
             }
 
+            department.Section = form.Section;
+
             await _context.SaveChangesAsync();
 
             return Ok(department);
@@ -89,7 +88,8 @@ namespace MsaasBackend.Controllers
             var department = new Department
             {
                 Name = form.Name,
-                HospitalId = form.HospitalId
+                HospitalId = form.HospitalId,
+                Section = form.Section
             };
 
             _context.Departments.Add(department);
