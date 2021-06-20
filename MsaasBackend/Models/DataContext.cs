@@ -1,4 +1,5 @@
 ﻿using Microsoft.EntityFrameworkCore;
+using BC = BCrypt.Net.BCrypt;
 
 namespace MsaasBackend.Models
 {
@@ -23,7 +24,14 @@ namespace MsaasBackend.Models
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
-            modelBuilder.Entity<User>().ToTable(nameof(Users));
+            modelBuilder.Entity<User>().ToTable(nameof(Users))
+                .HasData(new User
+                {
+                    Id = 1,
+                    Username = "root",
+                    PasswordHash = BC.EnhancedHashPassword("root"),
+                    Role = "Admin"
+                });
             modelBuilder.Entity<Hospital>().ToTable(nameof(Hospitals));
             modelBuilder.Entity<Department>().ToTable(nameof(Departments));
             modelBuilder.Entity<Physician>().ToTable(nameof(Physicians));
