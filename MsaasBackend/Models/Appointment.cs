@@ -12,6 +12,8 @@ namespace MsaasBackend.Models
         public int PhysicianId { get; set; }
         public Physician Physician { get; set; }
 
+        public MedicalRecord MedicalRecord { get; set; }
+
         public DateTime Time { get; set; }
 
         public string Description { get; set; }
@@ -22,7 +24,8 @@ namespace MsaasBackend.Models
             User = User.ToDto(),
             Physician = Physician.ToDto(),
             Time = Time,
-            Description = Description
+            Description = Description,
+            MedicalRecord = MedicalRecord?.ToDto()
         };
     }
 
@@ -40,5 +43,6 @@ namespace MsaasBackend.Models
         public PhysicianDto Physician { get; set; }
         public DateTime Time { get; set; }
         public string Description { get; set; }
+        public MedicalRecordDto MedicalRecord { get; set; }
     }
 }

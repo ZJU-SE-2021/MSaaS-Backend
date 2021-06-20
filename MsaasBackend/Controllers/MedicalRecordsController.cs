@@ -71,7 +71,7 @@ namespace MsaasBackend.Controllers
             };
             _context.MedicalRecords.Add(medicalRecord);
             await _context.SaveChangesAsync();
-            return CreatedAtAction(nameof(GetMedicalRecordById), new {Id = medicalRecord.Id}, medicalRecord);
+            return CreatedAtAction(nameof(GetMedicalRecordById), new {Id = medicalRecord.Id}, medicalRecord.ToDto());
         }
 
         [HttpPut("{id:int}")]

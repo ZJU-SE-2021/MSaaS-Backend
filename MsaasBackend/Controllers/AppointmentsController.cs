@@ -32,6 +32,7 @@ namespace MsaasBackend.Controllers
             if (!userId.HasValue) return Unauthorized();
             var res =
                 from a in _context.Appointments
+                    .Include(a => a.MedicalRecord)
                     .Include(a => a.User)
                     .Include(a => a.Physician)
                     .ThenInclude(p => p.Department)
@@ -50,6 +51,7 @@ namespace MsaasBackend.Controllers
             if (!userId.HasValue) return Unauthorized();
             var appointments =
                 from a in _context.Appointments
+                    .Include(a => a.MedicalRecord)
                     .Include(a => a.User)
                     .Include(a => a.Physician)
                     .ThenInclude(p => p.Department)

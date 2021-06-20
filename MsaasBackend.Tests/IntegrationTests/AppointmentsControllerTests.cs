@@ -21,7 +21,7 @@ namespace MsaasBackend.Tests.IntegrationTests
             var res = await GetAs("/appointments/1");
             res.EnsureSuccessStatusCode();
             var appointment = await res.Content.ReadFromJsonAsync<AppointmentDto>();
-            Assert.Equal(1, appointment?.UserId);
+            Assert.Equal(1, appointment?.Id);
         }
 
         [Fact]
