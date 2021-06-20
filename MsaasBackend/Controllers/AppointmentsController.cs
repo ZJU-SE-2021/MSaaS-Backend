@@ -1,9 +1,8 @@
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Security.Claims;
 using System.Threading.Tasks;
-using Microsoft.AspNetCore.Authentication.Cookies;
-using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
@@ -13,34 +12,54 @@ using MsaasBackend.Models;
 
 namespace MsaasBackend.Controllers
 {
-    [Authorize(AuthenticationSchemes =
-        CookieAuthenticationDefaults.AuthenticationScheme + "," + JwtBearerDefaults.AuthenticationScheme)]
+    [Authorize(AuthenticationSchemes = AuthenticationDefaults.AuthenticationScheme)]
     [Route("[controller]")]
     [ApiController]
-    public class AppointmentsController : ControllerBase
+    public class AppointmentsController : Controller
     {
         private readonly ILogger<AppointmentsController> _logger;
-        private readonly DataContext _context;
 
-        public AppointmentsController(ILogger<AppointmentsController> logger, DataContext context)
+        public AppointmentsController(ILogger<AppointmentsController> logger, DataContext context) : base(context)
         {
             _logger = logger;
-            _context = context;
+        }
+
+        [HttpGet]
+        [ProducesResponseType(typeof(IEnumerable<AppointmentDto>), StatusCodes.Status200OK)]
+        public async Task<IActionResult> GetAppointments()
+        {
+            var userId = GetCurrentUserId();
+            if (!userId.HasValue) return Unauthorized();
+            var res =
+                from a in _context.Appointments
+                    .Include(a => a.User)
+                    .Include(a => a.Physician)
+                    .ThenInclude(p => p.Department)
+                    .Include(a => a.Physician)
+                    .ThenInclude(p => p.User)
+                where a.UserId == userId
+                select a.ToDto();
+            return Ok(await res.ToListAsync());
         }
 
         [HttpGet("{id:int}")]
         [ProducesResponseType(typeof(AppointmentDto), StatusCodes.Status200OK)]
         public async Task<IActionResult> GetAppointmentById(int id)
         {
-            var appointment = await _context.Appointments.FindAsync(id);
+            var userId = GetCurrentUserId();
+            if (!userId.HasValue) return Unauthorized();
+            var appointments =
+                from a in _context.Appointments
+                    .Include(a => a.User)
+                    .Include(a => a.Physician)
+                    .ThenInclude(p => p.Department)
+                    .Include(a => a.Physician)
+                    .ThenInclude(p => p.User)
+                where a.Id == id && a.UserId == userId
+                select a.ToDto();
+            var appointment = await appointments.FirstOrDefaultAsync();
             if (appointment == null) return NotFound();
-
-            var claim = User.FindFirst(ClaimTypes.NameIdentifier);
-            if (claim == null) return Unauthorized();
-            var userId = Convert.ToInt32(claim.Value);
-            if (appointment.UserId != userId && appointment.Physician.UserId != userId) return Forbid();
-
-            return Ok(appointment.ToDto());
+            return Ok(appointment);
         }
 
         [HttpPost]
@@ -68,6 +87,14 @@ namespace MsaasBackend.Controllers
             };
             _context.Appointments.Add(appointment);
             await _context.SaveChangesAsync();
+
+            await _context.Entry(appointment).Reference(a => a.User).LoadAsync();
+            await _context.Entry(appointment)
+                .Reference(a => a.Physician)
+                .Query()
+                .Include(p => p.Department)
+                .Include(p => p.User)
+                .LoadAsync();
             return CreatedAtAction(nameof(GetAppointmentById), new {Id = appointment.Id}, appointment.ToDto());
         }
     }

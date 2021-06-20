@@ -32,7 +32,12 @@ namespace MsaasBackend.Controllers.Physicians
             if (!userId.HasValue) return Unauthorized();
             var res =
                 from a in _context.Appointments
-                where a.PhysicianId == userId
+                    .Include(a => a.User)
+                    .Include(a => a.Physician)
+                    .ThenInclude(p => p.Department)
+                    .Include(a => a.Physician)
+                    .ThenInclude(p => p.User)
+                where a.Physician.UserId == userId
                 select a.ToDto();
             return Ok(await res.ToListAsync());
         }
@@ -45,6 +50,11 @@ namespace MsaasBackend.Controllers.Physicians
             if (!userId.HasValue) return Unauthorized();
             var appointments =
                 from a in _context.Appointments
+                    .Include(a => a.User)
+                    .Include(a => a.Physician)
+                    .ThenInclude(p => p.Department)
+                    .Include(a => a.Physician)
+                    .ThenInclude(p => p.User)
                 where a.Id == id && a.PhysicianId == userId
                 select a.ToDto();
             var appointment = await appointments.FirstOrDefaultAsync();

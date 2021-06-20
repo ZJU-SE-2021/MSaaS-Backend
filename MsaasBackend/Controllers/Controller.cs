@@ -20,7 +20,7 @@ namespace MsaasBackend.Controllers
         {
             var currentId = User.FindFirst(ClaimTypes.NameIdentifier);
             if (currentId == null) return null;
-            return Convert.ToInt32(currentId);
+            return Convert.ToInt32(currentId.Value);
         }
 
         [ApiExplorerSettings(IgnoreApi = true)]

@@ -19,7 +19,7 @@ namespace MsaasBackend.Models
         public AppointmentDto ToDto() => new()
         {
             Id = Id,
-            UserId = UserId,
+            User = User.ToDto(),
             Physician = Physician.ToDto(),
             Time = Time,
             Description = Description
@@ -36,7 +36,7 @@ namespace MsaasBackend.Models
     public class AppointmentDto
     {
         public int Id { get; set; }
-        public int UserId { get; set; }
+        public UserDto User { get; set; }
         public PhysicianDto Physician { get; set; }
         public DateTime Time { get; set; }
         public string Description { get; set; }
