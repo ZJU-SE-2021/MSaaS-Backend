@@ -13,20 +13,27 @@ namespace MsaasBackend.Models
 
         public Hospital Hospital { get; set; }
 
+        public string Section { get; set; }
+
         public List<Physician> Physicians { get; set; }
 
         public DepartmentDto ToDto() => new()
         {
             Id = Id,
             Name = Name,
-            HospitalId = HospitalId
+            HospitalId = HospitalId,
+            Section = Section
         };
     }
 
     public class DepartmentDto
     {
         public int Id { get; set; }
+
         public string Name { get; set; }
+
+        public string Section { get; set; }
+
         public int HospitalId { get; set; }
     }
 
@@ -34,5 +41,7 @@ namespace MsaasBackend.Models
     {
         public int HospitalId { get; set; }
         [Required] public string Name { get; set; }
+
+        public string Section { get; set; }
     }
 }

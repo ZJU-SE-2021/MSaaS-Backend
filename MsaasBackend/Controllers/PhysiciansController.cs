@@ -1,6 +1,9 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using Microsoft.AspNetCore.Authentication.Cookies;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
@@ -9,6 +12,8 @@ using MsaasBackend.Models;
 
 namespace MsaasBackend.Controllers
 {
+    [Authorize(AuthenticationSchemes =
+        CookieAuthenticationDefaults.AuthenticationScheme + "," + JwtBearerDefaults.AuthenticationScheme)]
     [ApiController]
     [Route("[controller]")]
     public class PhysiciansController : ControllerBase
@@ -24,23 +29,33 @@ namespace MsaasBackend.Controllers
 
         [HttpGet]
         [ProducesResponseType(typeof(IEnumerable<PhysicianDto>), StatusCodes.Status200OK)]
-        public async Task<IActionResult> GetPhysicians()
+        public async Task<IActionResult> GetPhysicians(int? departmentId)
         {
-            return Ok(await _context.Physicians.ToListAsync());
+            var res =
+                from p in _context.Physicians.Include(p => p.Department)
+                    .Include(p => p.User)
+                where !departmentId.HasValue || p.DepartmentId == departmentId
+                select p.ToDto();
+            return Ok(await res.ToListAsync());
         }
 
         [HttpGet("{id:int}")]
         [ProducesResponseType(typeof(PhysicianDto), StatusCodes.Status200OK)]
         public async Task<IActionResult> GetPhysicianById(int id)
         {
-            var physicians = from u in _context.Physicians where u.UserId == id select u;
+            var physicians =
+                from u in _context.Physicians.Include(u => u.User)
+                    .Include(u => u.Department)
+                where u.Id == id
+                select u;
             var physician = await physicians.FirstOrDefaultAsync();
             if (physician == null) return NotFound();
             return Ok(physician.ToDto());
         }
-        
+
         [HttpDelete("{id:int}")]
         [ProducesResponseType(StatusCodes.Status200OK)]
+        [Authorize(Roles = "Admin")]
         public async Task<IActionResult> DeletePhysician(int id)
         {
             var physician = await _context.Physicians.FindAsync(id);
@@ -52,6 +67,7 @@ namespace MsaasBackend.Controllers
 
         [HttpPost]
         [ProducesResponseType(typeof(PhysicianDto), StatusCodes.Status201Created)]
+        [Authorize(Roles = "Admin")]
         public async Task<IActionResult> RegisterPhysician(PhysicianRegisterForm form)
         {
             if (!ModelState.IsValid) return ValidationProblem();
@@ -72,7 +88,7 @@ namespace MsaasBackend.Controllers
 
             await _context.SaveChangesAsync();
 
-            return CreatedAtAction(nameof(GetPhysicianById), new {Id = form.UserId}, physician.ToDto());
+            return CreatedAtAction(nameof(GetPhysicianById), new {Id = physician.Id}, physician.ToDto());
         }
     }
 }

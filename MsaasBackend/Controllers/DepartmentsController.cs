@@ -1,7 +1,8 @@
-using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using Microsoft.AspNetCore.Authentication.Cookies;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
@@ -11,6 +12,8 @@ using MsaasBackend.Models;
 
 namespace MsaasBackend.Controllers
 {
+    [Authorize(AuthenticationSchemes =
+        CookieAuthenticationDefaults.AuthenticationScheme + "," + JwtBearerDefaults.AuthenticationScheme)]
     [Route("[controller]")]
     [ApiController]
     public class DepartmentsController : ControllerBase
@@ -24,12 +27,14 @@ namespace MsaasBackend.Controllers
             _context = context;
         }
 
-
         [HttpGet]
         [ProducesResponseType(typeof(IEnumerable<DepartmentDto>), StatusCodes.Status200OK)]
-        public async Task<IActionResult> GetDepartments()
+        public async Task<IActionResult> GetDepartments(int? hospitalId)
         {
-            var departments = from d in _context.Departments select d.ToDto();
+            var departments =
+                from d in _context.Departments 
+                where !hospitalId.HasValue || d.HospitalId == hospitalId
+                select d.ToDto();
             return Ok(await departments.ToListAsync());
         }
 
@@ -44,6 +49,7 @@ namespace MsaasBackend.Controllers
 
         [HttpDelete("{id:int}")]
         [ProducesResponseType(StatusCodes.Status200OK)]
+        [Authorize(Roles = "Admin")]
         public async Task<IActionResult> DeleteDepartment(int id)
         {
             var department = await _context.Departments.FindAsync(id);
@@ -55,6 +61,7 @@ namespace MsaasBackend.Controllers
 
         [HttpPut("{id:int}")]
         [ProducesResponseType(typeof(DepartmentDto), StatusCodes.Status200OK)]
+        [Authorize(Roles = "Admin")]
         public async Task<IActionResult> UpdateDepartment(int id, DepartmentCreationForm form)
         {
             if (!ModelState.IsValid) return ValidationProblem();
@@ -67,6 +74,8 @@ namespace MsaasBackend.Controllers
                 department.Name = form.Name;
             }
 
+            department.Section = form.Section;
+
             await _context.SaveChangesAsync();
 
             return Ok(department);
@@ -74,6 +83,7 @@ namespace MsaasBackend.Controllers
 
         [HttpPost]
         [ProducesResponseType(typeof(DepartmentDto), StatusCodes.Status201Created)]
+        [Authorize(Roles = "Admin")]
         public async Task<IActionResult> CreateDepartment(DepartmentCreationForm form)
         {
             if (!ModelState.IsValid) return ValidationProblem();
@@ -89,7 +99,8 @@ namespace MsaasBackend.Controllers
             var department = new Department
             {
                 Name = form.Name,
-                HospitalId = form.HospitalId
+                HospitalId = form.HospitalId,
+                Section = form.Section
             };
 
             _context.Departments.Add(department);

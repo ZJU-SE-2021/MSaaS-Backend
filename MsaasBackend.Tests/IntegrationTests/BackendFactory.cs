@@ -33,7 +33,7 @@ namespace MsaasBackend.Tests.IntegrationTests
                 PasswordHash = BC.EnhancedHashPassword("physician password"),
                 Role = "Physician"
             };
-            db.Users.AddRange(user, admin);
+            db.Users.AddRange(user, admin, physician);
 
             for (var i = 1; i <= 4; ++i)
             {
@@ -48,17 +48,18 @@ namespace MsaasBackend.Tests.IntegrationTests
                 };
                 db.Users.Add(phyUser);
                 db.Physicians.Add(new Physician() {DepartmentId = 1, User = phyUser});
-                
-                db.Appointments.Add(new Appointment() {PhysicianId = 3, UserId = 1});
+
+                db.Appointments.Add(new Appointment() {PhysicianId = 1, UserId = 1});
             }
 
-            db.Users.Add(new User()
-            {
-                Username = "physician 5",
-                PasswordHash = BC.EnhancedHashPassword("physician password"),
-            });
+            db.Physicians.Add(new Physician() {DepartmentId = 1, User = physician});
+            // db.Users.Add(new User()
+            // {
+            //     Username = "physician 5",
+            //     PasswordHash = BC.EnhancedHashPassword("physician password"),
+            // });
 
-            
+
             db.MedicalRecords.Add(new MedicalRecord() {AppointmentId = 1});
             db.SaveChanges();
         }

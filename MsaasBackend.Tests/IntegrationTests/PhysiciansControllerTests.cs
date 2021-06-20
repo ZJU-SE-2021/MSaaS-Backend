@@ -27,10 +27,10 @@ namespace MsaasBackend.Tests.IntegrationTests
         [Fact]
         public async Task GetPhysicianById_ValidIdentity_Success()
         {
-            var res = await GetAs("/physicians/3");
+            var res = await GetAs("/physicians/5");
             res.EnsureSuccessStatusCode();
             var physician = await res.Content.ReadFromJsonAsync<PhysicianDto>();
-            Assert.Equal(3, physician?.UserId);
+            Assert.Equal(5, physician?.Id);
         }
 
         [Fact]
@@ -51,7 +51,7 @@ namespace MsaasBackend.Tests.IntegrationTests
         [Fact]
         public async Task DeletePhysician_ValidIdentity_Success()
         {
-            var res = await DeleteAs("/physicians/7", Admin);
+            var res = await DeleteAs("/physicians/1", Admin);
             res.EnsureSuccessStatusCode();
         }
     }

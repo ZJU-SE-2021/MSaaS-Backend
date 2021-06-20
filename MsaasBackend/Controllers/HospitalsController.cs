@@ -1,6 +1,8 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using Microsoft.AspNetCore.Authentication.Cookies;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
@@ -10,6 +12,8 @@ using MsaasBackend.Models;
 
 namespace MsaasBackend.Controllers
 {
+    [Authorize(AuthenticationSchemes =
+        CookieAuthenticationDefaults.AuthenticationScheme + "," + JwtBearerDefaults.AuthenticationScheme)]
     [ApiController]
     [Route("[controller]")]
     public class HospitalsController : ControllerBase
@@ -42,6 +46,7 @@ namespace MsaasBackend.Controllers
 
         [HttpPost]
         [ProducesResponseType(typeof(HospitalDto), StatusCodes.Status201Created)]
+        [Authorize(Roles = "Admin")]
         public async Task<IActionResult> CreateHospital(HospitalCreationForm form)
         {
             if (!ModelState.IsValid) return ValidationProblem();
@@ -61,6 +66,7 @@ namespace MsaasBackend.Controllers
 
         [HttpPut("{id:int}")]
         [ProducesResponseType(typeof(HospitalDto), StatusCodes.Status200OK)]
+        [Authorize(Roles = "Admin")]
         public async Task<IActionResult> UpdateHospital(int id, HospitalCreationForm form)
         {
             if (!ModelState.IsValid) return ValidationProblem();
@@ -80,6 +86,7 @@ namespace MsaasBackend.Controllers
 
         [HttpDelete("{id:int}")]
         [ProducesResponseType(StatusCodes.Status200OK)]
+        [Authorize(Roles = "Admin")]
         public async Task<IActionResult> DeleteHospital(int id)
         {
             var hospital = await _context.Hospitals.FindAsync(id);

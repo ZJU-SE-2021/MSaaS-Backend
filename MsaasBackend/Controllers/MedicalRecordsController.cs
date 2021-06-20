@@ -32,7 +32,10 @@ namespace MsaasBackend.Controllers
         [ProducesResponseType(typeof(MedicalRecordDto), StatusCodes.Status200OK)]
         public async Task<IActionResult> GetMedicalRecordById(int id)
         {
-            var records = from r in _context.MedicalRecords.Include(r => r.Appointment) where r.Id == id select r;
+            var records = 
+                from r in _context.MedicalRecords.Include(r => r.Appointment)
+                where r.Id == id
+                select r;
             var record = await records.FirstOrDefaultAsync();
             if (record == null) return NotFound();
 
@@ -41,24 +44,27 @@ namespace MsaasBackend.Controllers
             var userId = Convert.ToInt32(claim.Value);
 
             var appointment = record.Appointment;
-            if (appointment.UserId != userId && appointment.PhysicianId != userId) return Forbid();
+            if (appointment.UserId != userId && appointment.Physician.UserId != userId) return Forbid();
 
             return Ok(record.ToDto());
         }
 
         [HttpPost]
         [ProducesResponseType(typeof(MedicalRecordDto), StatusCodes.Status201Created)]
+        [Authorize(Roles = "Physician")]
         public async Task<IActionResult> AddMedicalRecord(MedicalRecordForm form)
         {
             if (!ModelState.IsValid) return ValidationProblem();
-            var appointments = from a in _context.Appointments where a.Id == form.AppointmentId select a;
+            var appointments =
+                from a in _context.Appointments
+                where a.Id == form.AppointmentId
+                select a;
             var appointment = await appointments.FirstOrDefaultAsync();
             if (appointment == null) return NotFound();
 
             var medicalRecord = new MedicalRecord
             {
                 AppointmentId = form.AppointmentId,
-                Appointment = appointment,
                 Symptom = form.Symptom,
                 PastMedicalHistory = form.Symptom,
                 Diagnosis = form.Diagnosis

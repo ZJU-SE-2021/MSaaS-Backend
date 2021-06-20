@@ -23,6 +23,7 @@ namespace MsaasBackend.Tests.IntegrationTests
 
         protected static LoginForm Admin { get; } = new() {Username = "admin", Password = "admin password"};
         protected static LoginForm User { get; } = new() {Username = "user", Password = "user password"};
+        protected static LoginForm Physician { get; } = new() {Username = "physician", Password = "physician password"};
 
         private Dictionary<string, string> _tokenCache = new();
 
