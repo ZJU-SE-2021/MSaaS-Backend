@@ -20,7 +20,7 @@ namespace MsaasBackend.Models
         {
             Id = Id,
             UserId = UserId,
-            Physician = Physician,
+            Physician = Physician.ToDto(),
             Time = Time,
             Description = Description
         };
@@ -37,7 +37,7 @@ namespace MsaasBackend.Models
     {
         public int Id { get; set; }
         public int UserId { get; set; }
-        public Physician Physician { get; set; }
+        public PhysicianDto Physician { get; set; }
         public DateTime Time { get; set; }
         public string Description { get; set; }
     }
