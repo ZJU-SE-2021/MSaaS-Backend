@@ -29,7 +29,7 @@ namespace MsaasBackend.Controllers
         }
 
         [HttpGet("{id:int}")]
-        [ProducesResponseType(typeof(DepartmentDto), StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(AppointmentDto), StatusCodes.Status200OK)]
         public async Task<IActionResult> GetAppointmentById(int id)
         {
             var appointment = await _context.Appointments.FindAsync(id);
