@@ -42,7 +42,7 @@ namespace MsaasBackend.Tests.IntegrationTests
                 DepartmentId = 1
             };
 
-            var res = await PostJsonAs("/physicians", form, Admin);
+            var res = await PostJsonAs("/admin/physicians", form, Admin);
             res.EnsureSuccessStatusCode();
             var physician = await res.Content.ReadFromJsonAsync<PhysicianDto>();
             AssertExtensions.ContainsDeeply(form, physician);
@@ -51,7 +51,7 @@ namespace MsaasBackend.Tests.IntegrationTests
         [Fact]
         public async Task DeletePhysician_ValidIdentity_Success()
         {
-            var res = await DeleteAs("/physicians/1", Admin);
+            var res = await DeleteAs("/admin/physicians/1", Admin);
             res.EnsureSuccessStatusCode();
         }
     }

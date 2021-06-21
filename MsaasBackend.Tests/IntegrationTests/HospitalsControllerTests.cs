@@ -42,7 +42,7 @@ namespace MsaasBackend.Tests.IntegrationTests
                 Address = "new address"
             };
 
-            var res = await PostJsonAs("/hospitals", form, Admin);
+            var res = await PostJsonAs("/admin/hospitals", form, Admin);
             res.EnsureSuccessStatusCode();
             var hospital = await res.Content.ReadFromJsonAsync<HospitalDto>();
             AssertExtensions.ContainsDeeply(form, hospital);
@@ -51,7 +51,7 @@ namespace MsaasBackend.Tests.IntegrationTests
         [Fact]
         public async Task DeleteHospital_ValidIdentity_Success()
         {
-            var res = await DeleteAs("/hospitals/3", Admin);
+            var res = await DeleteAs("/admin/hospitals/3", Admin);
             res.EnsureSuccessStatusCode();
         }
 
@@ -64,7 +64,7 @@ namespace MsaasBackend.Tests.IntegrationTests
                 Address = "updated address"
             };
 
-            var res = await PutJsonAs("/hospitals/4", form, Admin);
+            var res = await PutJsonAs("/admin/hospitals/4", form, Admin);
             res.EnsureSuccessStatusCode();
             var hospital = await res.Content.ReadFromJsonAsync<HospitalDto>();
             AssertExtensions.ContainsDeeply(form, hospital);

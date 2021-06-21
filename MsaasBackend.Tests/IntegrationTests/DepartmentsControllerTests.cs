@@ -42,7 +42,7 @@ namespace MsaasBackend.Tests.IntegrationTests
                 HospitalId = 1
             };
 
-            var res = await PostJsonAs("/departments", form, Admin);
+            var res = await PostJsonAs("/admin/departments", form, Admin);
             res.EnsureSuccessStatusCode();
             var departments = await res.Content.ReadFromJsonAsync<DepartmentDto>();
             AssertExtensions.ContainsDeeply(form, departments);
@@ -51,7 +51,7 @@ namespace MsaasBackend.Tests.IntegrationTests
         [Fact]
         public async Task DeleteDepartment_ValidIdentity_Success()
         {
-            var res = await DeleteAs("/departments/3", Admin);
+            var res = await DeleteAs("/admin/departments/3", Admin);
             res.EnsureSuccessStatusCode();
         }
 
@@ -63,7 +63,7 @@ namespace MsaasBackend.Tests.IntegrationTests
                 Name = "updated departments",
             };
 
-            var res = await PutJsonAs("/departments/4", form, Admin);
+            var res = await PutJsonAs("/admin/departments/4", form, Admin);
             res.EnsureSuccessStatusCode();
             var department = await res.Content.ReadFromJsonAsync<HospitalDto>();
             AssertExtensions.ContainsDeeply(form, department);
