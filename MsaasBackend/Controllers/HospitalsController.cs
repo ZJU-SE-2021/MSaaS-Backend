@@ -1,8 +1,6 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using Microsoft.AspNetCore.Authentication.Cookies;
-using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
@@ -12,8 +10,7 @@ using MsaasBackend.Models;
 
 namespace MsaasBackend.Controllers
 {
-    [Authorize(AuthenticationSchemes =
-        CookieAuthenticationDefaults.AuthenticationScheme + "," + JwtBearerDefaults.AuthenticationScheme)]
+    [Authorize(AuthenticationSchemes = AuthenticationDefaults.AuthenticationScheme)]
     [ApiController]
     [Route("[controller]")]
     public class HospitalsController : ControllerBase
@@ -42,66 +39,6 @@ namespace MsaasBackend.Controllers
             var hospital = await _context.Hospitals.FindAsync(id);
             if (hospital == null) return NotFound();
             return Ok(hospital.ToDto());
-        }
-
-        [HttpPost]
-        [ProducesResponseType(typeof(HospitalDto), StatusCodes.Status201Created)]
-        [Authorize(Roles = "Admin")]
-        public async Task<IActionResult> CreateHospital(HospitalCreationForm form)
-        {
-            if (!ModelState.IsValid) return ValidationProblem();
-            var hospitals = from h in _context.Hospitals where h.Name == form.Name select h;
-            if (await hospitals.AnyAsync()) return Conflict();
-
-            var hospital = new Hospital
-            {
-                Name = form.Name,
-                Address = form.Address,
-            };
-
-            _context.Hospitals.Add(hospital);
-            await _context.SaveChangesAsync();
-            return CreatedAtAction(nameof(GetHospital), new {Id = hospital.Id}, hospital.ToDto());
-        }
-
-        [HttpPut("{id:int}")]
-        [ProducesResponseType(typeof(HospitalDto), StatusCodes.Status200OK)]
-        [Authorize(Roles = "Admin")]
-        public async Task<IActionResult> UpdateHospital(int id, HospitalCreationForm form)
-        {
-            if (!ModelState.IsValid) return ValidationProblem();
-            var hospital = await _context.Hospitals.FindAsync(id);
-
-            if (hospital.Name != form.Name)
-            {
-                var hospitals = from h in _context.Hospitals where h.Name == form.Name select h;
-                if (await hospitals.AnyAsync()) return Conflict();
-                hospital.Name = form.Name;
-            }
-
-            hospital.Address = form.Address;
-            await _context.SaveChangesAsync();
-            return Ok(hospital.ToDto());
-        }
-
-        [HttpDelete("{id:int}")]
-        [ProducesResponseType(StatusCodes.Status200OK)]
-        [Authorize(Roles = "Admin")]
-        public async Task<IActionResult> DeleteHospital(int id)
-        {
-            var hospital = await _context.Hospitals.FindAsync(id);
-            if (hospital == null) return NotFound();
-
-            var departments = from d in _context.Departments where d.HospitalId == id select d;
-
-            _context.Hospitals.Remove(hospital);
-            foreach (var department in departments)
-            {
-                _context.Departments.Remove(department);
-            }
-
-            await _context.SaveChangesAsync();
-            return Ok();
         }
     }
 }
