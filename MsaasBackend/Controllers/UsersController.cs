@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.IdentityModel.Tokens.Jwt;
 using System.Linq;
 using System.Security.Claims;
@@ -23,17 +22,15 @@ namespace MsaasBackend.Controllers
     [Route("[controller]")]
     [Authorize(AuthenticationSchemes =
         CookieAuthenticationDefaults.AuthenticationScheme + "," + JwtBearerDefaults.AuthenticationScheme)]
-    public class UsersController : ControllerBase
+    public class UsersController : Controller
     {
         private readonly ILogger<UsersController> _logger;
-        private readonly DataContext _context;
         private readonly IOptions<JwtOptions> _jwtOptions;
 
         public UsersController(ILogger<UsersController> logger, DataContext context,
-            IOptions<JwtOptions> jwtOptions)
+            IOptions<JwtOptions> jwtOptions) : base(context)
         {
             _logger = logger;
-            _context = context;
             _jwtOptions = jwtOptions;
         }
 
@@ -114,7 +111,7 @@ namespace MsaasBackend.Controllers
             };
             _context.Users.Add(user);
             await _context.SaveChangesAsync();
-            return CreatedAtAction(nameof(GetUser), new {Id = user.Id}, user.ToDto());
+            return CreatedAtAction(nameof(GetCurrentUser), user.ToDto());
         }
 
         [HttpGet("Current")]
@@ -122,32 +119,13 @@ namespace MsaasBackend.Controllers
         [ProducesResponseType(StatusCodes.Status401Unauthorized)]
         public async Task<IActionResult> GetCurrentUser()
         {
-            var currentId = User.FindFirst(ClaimTypes.NameIdentifier);
-            if (currentId == null) return Unauthorized();
-            return await GetUser(Convert.ToInt32(currentId.Value));
-        }
+            var userId = GetCurrentUserId();
+            if (!userId.HasValue) return Unauthorized();
 
-        [HttpGet("{id:int}")]
-        [ProducesResponseType(typeof(UserDto), StatusCodes.Status200OK)]
-        [ProducesResponseType(StatusCodes.Status404NotFound)]
-        [ProducesResponseType(StatusCodes.Status403Forbidden)]
-        [Authorize(Roles = "Admin")]
-        public async Task<IActionResult> GetUser(int id)
-        {
-            var users = from u in _context.Users where u.Id == id select u;
+            var users = from u in _context.Users where u.Id == userId select u;
             var user = await users.FirstOrDefaultAsync();
             if (user == null) return NotFound();
             return Ok(user.ToDto());
-        }
-
-        [HttpGet]
-        [ProducesResponseType(typeof(IEnumerable<UserDto>), StatusCodes.Status200OK)]
-        [ProducesResponseType(StatusCodes.Status403Forbidden)]
-        [Authorize(Roles = "Admin")]
-        public async Task<IActionResult> GetUsers()
-        {
-            var users = from u in _context.Users select u.ToDto();
-            return Ok(await users.ToListAsync());
         }
 
         [HttpPut("Current")]
@@ -158,39 +136,8 @@ namespace MsaasBackend.Controllers
         public async Task<IActionResult> UpdateCurrentUser(UpdateUserForm form)
         {
             if (!ModelState.IsValid) return ValidationProblem();
-            var currentId = User.FindFirst(ClaimTypes.NameIdentifier);
-            if (currentId == null) return Unauthorized();
-            var user = await _context.Users.FindAsync(currentId);
-            var formAdmin = new UpdateUserFormAdmin()
-            {
-                Name = form.Name,
-                Birthday = form.Birthday,
-                Email = form.Email,
-                Gender = form.Gender,
-                Password = form.Password,
-                Phone = form.Phone,
-                Role = user.Role,
-                Username = form.Username
-            };
+            var user = await GetUser();
 
-            return await UpdateUser(user, formAdmin);
-        }
-
-        [HttpPut("{id:int}")]
-        [ProducesResponseType(typeof(UserDto), StatusCodes.Status200OK)]
-        [ProducesResponseType(StatusCodes.Status404NotFound)]
-        [ProducesResponseType(StatusCodes.Status400BadRequest)]
-        [ProducesResponseType(StatusCodes.Status403Forbidden)]
-        [Authorize(Roles = "Admin")]
-        public async Task<IActionResult> UpdateUser(int id, UpdateUserFormAdmin form)
-        {
-            if (!ModelState.IsValid) return ValidationProblem();
-            var user = await _context.Users.FindAsync(id);
-            return await UpdateUser(user, form);
-        }
-
-        private async Task<IActionResult> UpdateUser(User user, UpdateUserFormAdmin form)
-        {
             if (user.Username != form.Username)
             {
                 var users = from u in _context.Users where u.Username == form.Username select u;
@@ -203,27 +150,11 @@ namespace MsaasBackend.Controllers
             user.Email = form.Email;
             user.Gender = form.Gender;
             user.Phone = form.Phone;
-            user.Role = form.Role;
 
             if (form.Password != null) user.PasswordHash = BC.EnhancedHashPassword(form.Password);
             await _context.SaveChangesAsync();
 
             return Ok(user.ToDto());
-        }
-
-        [HttpDelete("{id:int}")]
-        [ProducesResponseType(StatusCodes.Status200OK)]
-        [ProducesResponseType(StatusCodes.Status404NotFound)]
-        [ProducesResponseType(StatusCodes.Status400BadRequest)]
-        [ProducesResponseType(StatusCodes.Status403Forbidden)]
-        [Authorize(Roles = "Admin")]
-        public async Task<IActionResult> DeleteUser(int id)
-        {
-            var user = await _context.Users.FindAsync(id);
-            if (user == null) return NotFound();
-            _context.Users.Remove(user);
-            await _context.SaveChangesAsync();
-            return Ok();
         }
     }
 }

@@ -24,7 +24,7 @@ namespace MsaasBackend.Controllers
         }
 
         [ApiExplorerSettings(IgnoreApi = true)]
-        public async Task<User> GetCurrentUser()
+        public async Task<User> GetUser()
         {
             var id = GetCurrentUserId();
             if (!id.HasValue) return null;
