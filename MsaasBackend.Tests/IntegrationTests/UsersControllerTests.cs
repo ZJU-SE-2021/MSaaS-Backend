@@ -33,16 +33,16 @@ namespace MsaasBackend.Tests.IntegrationTests
         [Fact]
         public async Task GetUser_ValidIdentity_Success()
         {
-            var res = await GetAs("/users/1", Admin);
+            var res = await GetAs("/admin/users/1", Admin);
             res.EnsureSuccessStatusCode();
             var user = await res.Content.ReadFromJsonAsync<UserDto>();
-            Assert.Equal("user", user?.Username);
+            Assert.Equal("root", user?.Username);
         }
 
         [Fact]
         public async Task GetUsers_ValidIdentity_Success()
         {
-            var res = await GetAs("/users", Admin);
+            var res = await GetAs("/admin/users", Admin);
             res.EnsureSuccessStatusCode();
             var users = await res.Content.ReadFromJsonAsync<ICollection<UserDto>>();
             Assert.True(users?.Count > 0);
@@ -72,16 +72,16 @@ namespace MsaasBackend.Tests.IntegrationTests
                 // Username = ""
             };
 
-            var putRes = await PutJsonAs($"/users/{user.Id}", form, Admin);
+            var putRes = await PutJsonAs($"/admin/users/{user.Id}", form, Admin);
             putRes.EnsureSuccessStatusCode();
 
-            var getRes = await GetAs($"/users/{user.Id}", Admin);
+            var getRes = await GetAs($"/admin/users/{user.Id}", Admin);
             getRes.EnsureSuccessStatusCode();
             var updatedUser = await getRes.Content.ReadFromJsonAsync<UserDto>();
 
             AssertExtensions.ContainsDeeply(form, updatedUser);
 
-            var deleteRes = await DeleteAs($"/users/{user.Id}", Admin);
+            var deleteRes = await DeleteAs($"/admin/users/{user.Id}", Admin);
             deleteRes.EnsureSuccessStatusCode();
         }
     }

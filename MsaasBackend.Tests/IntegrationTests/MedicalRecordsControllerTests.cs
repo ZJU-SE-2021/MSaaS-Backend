@@ -32,7 +32,7 @@ namespace MsaasBackend.Tests.IntegrationTests
                 AppointmentId = 2
             };
 
-            var res = await PostJsonAs("/medicalrecords", form, Physician);
+            var res = await PostJsonAs("/physicians/medicalrecords", form, Physician);
             res.EnsureSuccessStatusCode();
             var medicalRecord = await res.Content.ReadFromJsonAsync<MedicalRecordDto>();
             AssertExtensions.ContainsDeeply(form, medicalRecord);

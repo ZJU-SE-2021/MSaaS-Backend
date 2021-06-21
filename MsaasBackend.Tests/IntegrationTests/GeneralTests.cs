@@ -13,10 +13,10 @@ namespace MsaasBackend.Tests.IntegrationTests
         }
 
         [Theory]
-        [InlineData("GET", "users/1")]
-        [InlineData("GET", "users")]
-        [InlineData("DELETE", "users/1")]
-        [InlineData("PUT", "users/1")]
+        [InlineData("GET", "/admin/users/1")]
+        [InlineData("GET", "/admin/users")]
+        [InlineData("DELETE", "/admin/users/1")]
+        [InlineData("PUT", "/admin/users/1")]
         public async Task General_PrivilegedApi_Forbidden(string method, string uri)
         {
             var res = await SendAs(new HttpRequestMessage(new HttpMethod(method), uri), User);

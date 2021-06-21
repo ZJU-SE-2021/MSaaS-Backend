@@ -21,7 +21,7 @@ namespace MsaasBackend.Tests.IntegrationTests
         protected readonly BackendFactory<Startup> _factory;
         protected readonly HttpClient _client;
 
-        protected static LoginForm Admin { get; } = new() {Username = "admin", Password = "admin password"};
+        protected static LoginForm Admin { get; } = new() {Username = "root", Password = "root"};
         protected static LoginForm User { get; } = new() {Username = "user", Password = "user password"};
         protected static LoginForm Physician { get; } = new() {Username = "physician", Password = "physician password"};
 
