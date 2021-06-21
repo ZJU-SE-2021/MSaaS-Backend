@@ -1,8 +1,6 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using Microsoft.AspNetCore.Authentication.Cookies;
-using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
@@ -12,8 +10,7 @@ using MsaasBackend.Models;
 
 namespace MsaasBackend.Controllers
 {
-    [Authorize(AuthenticationSchemes =
-        CookieAuthenticationDefaults.AuthenticationScheme + "," + JwtBearerDefaults.AuthenticationScheme)]
+    [Authorize(AuthenticationSchemes = AuthenticationDefaults.AuthenticationScheme)]
     [Route("[controller]")]
     [ApiController]
     public class DepartmentsController : ControllerBase
@@ -32,7 +29,7 @@ namespace MsaasBackend.Controllers
         public async Task<IActionResult> GetDepartments(int? hospitalId)
         {
             var departments =
-                from d in _context.Departments 
+                from d in _context.Departments
                 where !hospitalId.HasValue || d.HospitalId == hospitalId
                 select d.ToDto();
             return Ok(await departments.ToListAsync());
@@ -45,68 +42,6 @@ namespace MsaasBackend.Controllers
             var department = await _context.Departments.FindAsync(id);
             if (department == null) return NotFound();
             return Ok(department.ToDto());
-        }
-
-        [HttpDelete("{id:int}")]
-        [ProducesResponseType(StatusCodes.Status200OK)]
-        [Authorize(Roles = "Admin")]
-        public async Task<IActionResult> DeleteDepartment(int id)
-        {
-            var department = await _context.Departments.FindAsync(id);
-            if (department == null) return NotFound();
-            _context.Departments.Remove(department);
-            await _context.SaveChangesAsync();
-            return Ok();
-        }
-
-        [HttpPut("{id:int}")]
-        [ProducesResponseType(typeof(DepartmentDto), StatusCodes.Status200OK)]
-        [Authorize(Roles = "Admin")]
-        public async Task<IActionResult> UpdateDepartment(int id, DepartmentCreationForm form)
-        {
-            if (!ModelState.IsValid) return ValidationProblem();
-            var department = await _context.Departments.FindAsync(id);
-
-            if (department.Name != form.Name)
-            {
-                var departments = from d in _context.Departments where d.Name == form.Name select d;
-                if (await departments.AnyAsync()) return Conflict();
-                department.Name = form.Name;
-            }
-
-            department.Section = form.Section;
-
-            await _context.SaveChangesAsync();
-
-            return Ok(department);
-        }
-
-        [HttpPost]
-        [ProducesResponseType(typeof(DepartmentDto), StatusCodes.Status201Created)]
-        [Authorize(Roles = "Admin")]
-        public async Task<IActionResult> CreateDepartment(DepartmentCreationForm form)
-        {
-            if (!ModelState.IsValid) return ValidationProblem();
-            var hospital = await _context.Hospitals.FindAsync(form.HospitalId);
-            if (hospital == null) return NotFound();
-
-            var departments =
-                from d in _context.Departments
-                where d.HospitalId == form.HospitalId && d.Name == form.Name
-                select d;
-            if (await departments.AnyAsync()) return Conflict();
-
-            var department = new Department
-            {
-                Name = form.Name,
-                HospitalId = form.HospitalId,
-                Section = form.Section
-            };
-
-            _context.Departments.Add(department);
-            await _context.SaveChangesAsync();
-
-            return CreatedAtAction(nameof(GetDepartment), new {Id = department.Id}, department.ToDto());
         }
     }
 }
