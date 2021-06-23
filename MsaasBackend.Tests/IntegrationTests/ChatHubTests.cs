@@ -33,19 +33,20 @@ namespace MsaasBackend.Tests.IntegrationTests
         {
             var userConn = BuildConnection(User);
             var physicianConn = BuildConnection(Physician);
-            var mockHandler = new Mock<Action<ChatMessage>>();
+            var mockHandler = new Mock<Action<OutboundChatMessage>>();
 
-            physicianConn.On<ChatMessage>("ReceiveMessage", mockHandler.Object);
+            physicianConn.On<OutboundChatMessage>("ReceiveMessage", mockHandler.Object);
             await physicianConn.StartAsync();
             await userConn.StartAsync();
 
-            var message = new ChatMessage()
+            var message = new InboundChatMessage()
             {
                 AppointmentId = 1,
                 Message = "test message from user"
             };
             await userConn.SendAsync("SendMessageToPhysician", message);
-            await mockHandler.VerifyWithTimeoutAsync(x => x(It.Is<ChatMessage>(n => n.Message == message.Message)),
+            await mockHandler.VerifyWithTimeoutAsync(
+                x => x(It.Is<OutboundChatMessage>(n => n.Message == message.Message)),
                 Times.Once());
         }
 
@@ -54,19 +55,20 @@ namespace MsaasBackend.Tests.IntegrationTests
         {
             var physicianConn = BuildConnection(Physician);
             var userConn = BuildConnection(User);
-            var mockHandler = new Mock<Action<ChatMessage>>();
+            var mockHandler = new Mock<Action<OutboundChatMessage>>();
 
-            userConn.On<ChatMessage>("ReceiveMessage", mockHandler.Object);
+            userConn.On<OutboundChatMessage>("ReceiveMessage", mockHandler.Object);
             await userConn.StartAsync();
             await physicianConn.StartAsync();
 
-            var message = new ChatMessage()
+            var message = new InboundChatMessage()
             {
                 AppointmentId = 1,
                 Message = "test message from physician"
             };
             await physicianConn.SendAsync("SendMessageToUser", message);
-            await mockHandler.VerifyWithTimeoutAsync(x => x(It.Is<ChatMessage>(n => n.Message == message.Message)),
+            await mockHandler.VerifyWithTimeoutAsync(
+                x => x(It.Is<OutboundChatMessage>(n => n.Message == message.Message)),
                 Times.Once());
         }
     }

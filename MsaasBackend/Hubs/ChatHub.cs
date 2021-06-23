@@ -13,7 +13,7 @@ namespace MsaasBackend.Hubs
 {
     public interface IChatClient
     {
-        Task ReceiveMessage(ChatMessage message);
+        Task ReceiveMessage(OutboundChatMessage message);
     }
 
     [Authorize(AuthenticationSchemes = AuthenticationDefaults.AuthenticationScheme)]
@@ -29,7 +29,7 @@ namespace MsaasBackend.Hubs
         }
 
         [Authorize(Roles = "User")]
-        public async Task SendMessageToPhysician(ChatMessage message)
+        public async Task SendMessageToPhysician(InboundChatMessage message)
         {
             var appointments =
                 from a in _context.Appointments
@@ -38,11 +38,13 @@ namespace MsaasBackend.Hubs
                 select a;
             var appointment = await appointments.FirstOrDefaultAsync();
             if (appointment == null) throw new HubException("Appointment not found");
-            await Clients.User(Convert.ToString(appointment.Physician.UserId)).ReceiveMessage(message);
+
+            await Clients.User(Convert.ToString(appointment.Physician.UserId))
+                .ReceiveMessage(OutboundChatMessage.FromInbound(message));
         }
 
         [Authorize(Roles = "Physician")]
-        public async Task SendMessageToUser(ChatMessage message)
+        public async Task SendMessageToUser(InboundChatMessage message)
         {
             var appointments =
                 from a in _context.Appointments
@@ -51,7 +53,8 @@ namespace MsaasBackend.Hubs
                 select a;
             var appointment = await appointments.FirstOrDefaultAsync();
             if (appointment == null) throw new HubException("Appointment not found");
-            await Clients.User(Convert.ToString(appointment.UserId)).ReceiveMessage(message);
+            await Clients.User(Convert.ToString(appointment.UserId))
+                .ReceiveMessage(OutboundChatMessage.FromInbound(message));
         }
 
         private int GetUserId()
