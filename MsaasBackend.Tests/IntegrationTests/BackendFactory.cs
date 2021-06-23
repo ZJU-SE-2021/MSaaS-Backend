@@ -33,7 +33,14 @@ namespace MsaasBackend.Tests.IntegrationTests
             {
                 db.Hospitals.Add(new Hospital() {Name = $"hospital {i}"});
                 db.Departments.Add(new Department {HospitalId = 1, Name = $"department {i}"});
+            }
 
+            db.Physicians.Add(new Physician() {DepartmentId = 1, User = physician});
+            db.Appointments.Add(new Appointment() {PhysicianId = 1, UserId = 2});
+            db.MedicalRecords.Add(new MedicalRecord() {AppointmentId = 1});
+
+            for (var i = 1; i <= 4; ++i)
+            {
                 var phyUser = new User
                 {
                     Username = $"physician {i}",
@@ -46,15 +53,6 @@ namespace MsaasBackend.Tests.IntegrationTests
                 db.Appointments.Add(new Appointment() {PhysicianId = 1, UserId = 2});
             }
 
-            db.Physicians.Add(new Physician() {DepartmentId = 1, User = physician});
-            // db.Users.Add(new User()
-            // {
-            //     Username = "physician 5",
-            //     PasswordHash = BC.EnhancedHashPassword("physician password"),
-            // });
-
-
-            db.MedicalRecords.Add(new MedicalRecord() {AppointmentId = 1});
             db.SaveChanges();
         }
 

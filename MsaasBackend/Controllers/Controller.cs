@@ -15,16 +15,14 @@ namespace MsaasBackend.Controllers
             _context = context;
         }
 
-        [ApiExplorerSettings(IgnoreApi = true)]
-        public int? GetCurrentUserId()
+        protected int? GetCurrentUserId()
         {
             var currentId = User.FindFirst(ClaimTypes.NameIdentifier);
             if (currentId == null) return null;
             return Convert.ToInt32(currentId.Value);
         }
 
-        [ApiExplorerSettings(IgnoreApi = true)]
-        public async Task<User> GetUser()
+        protected async Task<User> GetUser()
         {
             var id = GetCurrentUserId();
             if (!id.HasValue) return null;
