@@ -71,5 +71,39 @@ namespace MsaasBackend.Tests.IntegrationTests
                 x => x(It.Is<OutboundChatMessage>(n => n.Message == message.Message)),
                 Times.Once());
         }
+
+        [Fact]
+        public async Task VideoCall_ValidIdentity_Success()
+        {
+            var physicianConn = BuildConnection(Physician);
+            var userConn = BuildConnection(User);
+            var userHandler = new Mock<Action<OutboundVideoCall>>();
+            var physicianHandler = new Mock<Action<OutboundVideoCall>>();
+
+            userConn.On<OutboundVideoCall>("ReceiveVideoCallResponse", userHandler.Object);
+            physicianConn.On<OutboundVideoCall>("ReceiveVideoCallRequest", async req =>
+            {
+                var res = new InboundVideoCall()
+                {
+                    AppointmentId = req.AppointmentId,
+                    Sdp = new RtcSessionDescription() {Type = "answer", Sdp = "xxx"}
+                };
+
+                await physicianConn.SendAsync("SendVideoCallResponseToUser", res);
+            });
+            await userConn.StartAsync();
+            await physicianConn.StartAsync();
+
+            var req = new InboundVideoCall()
+            {
+                AppointmentId = 1,
+                Sdp = new RtcSessionDescription() {Type = "offer", Sdp = "xxx"}
+            };
+
+            await userConn.SendAsync("SendVideoCallRequestToPhysician", req);
+            await userHandler.VerifyWithTimeoutAsync(
+                x => x(It.Is<OutboundVideoCall>(n => n.Sdp.Type == "answer")),
+                Times.Once());
+        }
     }
 }
