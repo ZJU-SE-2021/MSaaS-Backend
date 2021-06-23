@@ -24,7 +24,7 @@ namespace MsaasBackend.Controllers.Physicians
 
         [HttpGet("{id:int}")]
         [ProducesResponseType(typeof(MedicalRecordDto), StatusCodes.Status200OK)]
-        public async Task<IActionResult> GetMedicalRecordById(int id)
+        public async Task<IActionResult> GetPhysicianMedicalRecordById(int id)
         {
             var userId = GetCurrentUserId();
             if (!userId.HasValue) return Unauthorized();

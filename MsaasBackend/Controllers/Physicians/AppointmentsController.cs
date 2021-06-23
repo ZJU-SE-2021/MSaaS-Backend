@@ -26,7 +26,7 @@ namespace MsaasBackend.Controllers.Physicians
 
         [HttpGet]
         [ProducesResponseType(typeof(IEnumerable<AppointmentDto>), StatusCodes.Status200OK)]
-        public async Task<IActionResult> GetAppointments()
+        public async Task<IActionResult> GetPhysicianAppointments()
         {
             var userId = GetCurrentUserId();
             if (!userId.HasValue) return Unauthorized();
@@ -45,7 +45,7 @@ namespace MsaasBackend.Controllers.Physicians
 
         [HttpGet("{id:int}")]
         [ProducesResponseType(typeof(AppointmentDto), StatusCodes.Status200OK)]
-        public async Task<IActionResult> GetAppointmentById(int id)
+        public async Task<IActionResult> GetPhysicianAppointmentById(int id)
         {
             var userId = GetCurrentUserId();
             if (!userId.HasValue) return Unauthorized();
