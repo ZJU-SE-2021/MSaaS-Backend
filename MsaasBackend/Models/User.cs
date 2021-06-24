@@ -49,7 +49,8 @@ namespace MsaasBackend.Models
             Birthday = Birthday,
             Email = Email,
             Gender = Gender,
-            Phone = Phone
+            Phone = Phone,
+            Role = Role
         };
     }
 
@@ -77,6 +78,8 @@ namespace MsaasBackend.Models
         public string Phone { get; set; }
 
         public string Email { get; set; }
+        
+        public string Role { get; set; }
     }
 
     public class LoginForm
