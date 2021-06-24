@@ -1,4 +1,5 @@
 using System;
+using System.Text.Json.Serialization;
 
 namespace MsaasBackend.Models
 {
@@ -36,6 +37,14 @@ namespace MsaasBackend.Models
         public string Description { get; set; }
     }
 
+    [JsonConverter(typeof(JsonStringEnumConverter))]
+    public enum AppointmentState
+    {
+        Created,
+        InProgress,
+        Finished
+    }
+
     public class AppointmentDto
     {
         public int Id { get; set; }
@@ -44,5 +53,14 @@ namespace MsaasBackend.Models
         public DateTime Time { get; set; }
         public string Description { get; set; }
         public MedicalRecordDto MedicalRecord { get; set; }
+
+        public AppointmentState State
+        {
+            get
+            {
+                if (MedicalRecord != null) return AppointmentState.Finished;
+                return Time < DateTime.Now ? AppointmentState.InProgress : AppointmentState.Created;
+            }
+        }
     }
 }
