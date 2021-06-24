@@ -88,6 +88,15 @@ namespace MsaasBackend.Controllers
             });
         }
 
+        [HttpGet("Logout")]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        public async Task<IActionResult> Logout()
+        {
+            await HttpContext.SignOutAsync();
+            return NoContent();
+        }
+
         [HttpPost]
         [AllowAnonymous]
         [ProducesResponseType(typeof(UserDto), StatusCodes.Status201Created)]
