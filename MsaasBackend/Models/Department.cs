@@ -21,7 +21,7 @@ namespace MsaasBackend.Models
         {
             Id = Id,
             Name = Name,
-            HospitalId = HospitalId,
+            Hospital = Hospital.ToDto(),
             Section = Section
         };
     }
@@ -34,7 +34,7 @@ namespace MsaasBackend.Models
 
         public string Section { get; set; }
 
-        public int HospitalId { get; set; }
+        public HospitalDto Hospital { get; set; }
     }
 
     public class DepartmentCreationForm

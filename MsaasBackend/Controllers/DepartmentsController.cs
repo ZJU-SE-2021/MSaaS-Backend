@@ -30,6 +30,7 @@ namespace MsaasBackend.Controllers
         {
             var departments =
                 from d in _context.Departments
+                    .Include(d => d.Hospital)
                 where !hospitalId.HasValue || d.HospitalId == hospitalId
                 select d.ToDto();
             return Ok(await departments.ToListAsync());
@@ -41,6 +42,7 @@ namespace MsaasBackend.Controllers
         {
             var department = await _context.Departments.FindAsync(id);
             if (department == null) return NotFound();
+            await _context.Entry(department).Reference(d => d.Hospital).LoadAsync();
             return Ok(department.ToDto());
         }
     }

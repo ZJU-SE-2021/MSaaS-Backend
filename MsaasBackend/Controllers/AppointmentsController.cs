@@ -36,6 +36,7 @@ namespace MsaasBackend.Controllers
                     .Include(a => a.User)
                     .Include(a => a.Physician)
                     .ThenInclude(p => p.Department)
+                    .ThenInclude(d=>d.Hospital)
                     .Include(a => a.Physician)
                     .ThenInclude(p => p.User)
                 where a.UserId == userId
@@ -55,6 +56,7 @@ namespace MsaasBackend.Controllers
                     .Include(a => a.User)
                     .Include(a => a.Physician)
                     .ThenInclude(p => p.Department)
+                    .ThenInclude(d=>d.Hospital)
                     .Include(a => a.Physician)
                     .ThenInclude(p => p.User)
                 where a.Id == id && a.UserId == userId
@@ -95,6 +97,7 @@ namespace MsaasBackend.Controllers
                 .Reference(a => a.Physician)
                 .Query()
                 .Include(p => p.Department)
+                .ThenInclude(d=>d.Hospital)
                 .Include(p => p.User)
                 .LoadAsync();
             return CreatedAtAction(nameof(GetAppointmentById), new {Id = appointment.Id}, appointment.ToDto());

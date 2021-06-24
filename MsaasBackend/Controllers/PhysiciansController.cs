@@ -29,7 +29,9 @@ namespace MsaasBackend.Controllers
         public async Task<IActionResult> GetPhysicians(int? departmentId)
         {
             var res =
-                from p in _context.Physicians.Include(p => p.Department)
+                from p in _context.Physicians
+                    .Include(p => p.Department)
+                    .ThenInclude(d=>d.Hospital)
                     .Include(p => p.User)
                 where !departmentId.HasValue || p.DepartmentId == departmentId
                 select p.ToDto();
@@ -41,8 +43,10 @@ namespace MsaasBackend.Controllers
         public async Task<IActionResult> GetPhysicianById(int id)
         {
             var physicians =
-                from u in _context.Physicians.Include(u => u.User)
+                from u in _context.Physicians
+                    .Include(u => u.User)
                     .Include(u => u.Department)
+                    .ThenInclude(d=>d.Hospital)
                 where u.Id == id
                 select u;
             var physician = await physicians.FirstOrDefaultAsync();
