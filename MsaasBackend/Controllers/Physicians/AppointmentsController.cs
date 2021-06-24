@@ -36,6 +36,7 @@ namespace MsaasBackend.Controllers.Physicians
                     .Include(a => a.User)
                     .Include(a => a.Physician)
                     .ThenInclude(p => p.Department)
+                    .ThenInclude(d=>d.Hospital)
                     .Include(a => a.Physician)
                     .ThenInclude(p => p.User)
                 where a.Physician.UserId == userId
@@ -55,6 +56,7 @@ namespace MsaasBackend.Controllers.Physicians
                     .Include(a => a.User)
                     .Include(a => a.Physician)
                     .ThenInclude(p => p.Department)
+                    .ThenInclude(d=>d.Hospital)
                     .Include(a => a.Physician)
                     .ThenInclude(p => p.User)
                 where a.Id == id && a.PhysicianId == userId

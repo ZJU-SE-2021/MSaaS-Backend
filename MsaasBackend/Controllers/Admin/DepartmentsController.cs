@@ -40,6 +40,7 @@ namespace MsaasBackend.Controllers.Admin
         {
             if (!ModelState.IsValid) return ValidationProblem();
             var department = await _context.Departments.FindAsync(id);
+            if (department == null) return NotFound();
 
             if (department.Name != form.Name)
             {
@@ -52,7 +53,9 @@ namespace MsaasBackend.Controllers.Admin
 
             await _context.SaveChangesAsync();
 
-            return Ok(department);
+            await _context.Entry(department).Reference(d => d.Hospital).LoadAsync();
+
+            return Ok(department.ToDto());
         }
 
         [HttpPost]
@@ -78,6 +81,8 @@ namespace MsaasBackend.Controllers.Admin
 
             _context.Departments.Add(department);
             await _context.SaveChangesAsync();
+
+            await _context.Entry(department).Reference(d => d.Hospital).LoadAsync();
 
             return CreatedAtAction("GetDepartment", new {Id = department.Id}, department.ToDto());
         }

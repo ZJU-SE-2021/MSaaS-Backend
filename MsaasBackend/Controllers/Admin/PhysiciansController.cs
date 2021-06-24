@@ -53,6 +53,11 @@ namespace MsaasBackend.Controllers.Admin
             _context.Physicians.Add(physician);
 
             await _context.SaveChangesAsync();
+            await _context.Entry(physician)
+                .Reference(p => p.Department)
+                .Query()
+                .Include(d=>d.Hospital)
+                .LoadAsync();
 
             return CreatedAtAction("GetPhysicianById", new {Id = physician.Id}, physician.ToDto());
         }
