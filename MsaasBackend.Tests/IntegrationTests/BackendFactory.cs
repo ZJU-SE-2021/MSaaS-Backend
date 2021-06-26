@@ -1,4 +1,5 @@
-﻿using System.Linq;
+﻿using System;
+using System.Linq;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc.Testing;
 using Microsoft.EntityFrameworkCore;
@@ -50,7 +51,9 @@ namespace MsaasBackend.Tests.IntegrationTests
                 db.Users.Add(phyUser);
                 db.Physicians.Add(new Physician() {DepartmentId = 1, User = phyUser});
 
-                db.Appointments.Add(new Appointment() {PhysicianId = 1, UserId = 2});
+                db.Appointments.Add(new Appointment()
+                    {PhysicianId = 1, UserId = 2, Time = DateTime.Now.AddDays(i - 2)});
+                db.MedicalRecords.Add(new MedicalRecord() {AppointmentId = i + 1});
             }
 
             db.SaveChanges();
