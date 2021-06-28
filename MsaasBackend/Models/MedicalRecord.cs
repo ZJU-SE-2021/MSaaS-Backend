@@ -13,13 +13,16 @@ namespace MsaasBackend.Models
 
         public string Diagnosis { get; set; }
 
+        public string Prescription { get; set; }
+
         public MedicalRecordDto ToDto() => new()
         {
             Id = Id,
             AppointmentId = AppointmentId,
             Symptom = Symptom,
             PastMedicalHistory = PastMedicalHistory,
-            Diagnosis = Diagnosis
+            Diagnosis = Diagnosis,
+            Prescription = Prescription
         };
     }
 
@@ -32,6 +35,8 @@ namespace MsaasBackend.Models
         public string PastMedicalHistory { get; set; }
 
         public string Diagnosis { get; set; }
+
+        public string Prescription { get; set; }
     }
 
     public class MedicalRecordDto
@@ -45,5 +50,7 @@ namespace MsaasBackend.Models
         public string PastMedicalHistory { get; set; }
 
         public string Diagnosis { get; set; }
+
+        public string Prescription { get; set; }
     }
 }

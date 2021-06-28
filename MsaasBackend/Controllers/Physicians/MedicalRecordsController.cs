@@ -57,8 +57,9 @@ namespace MsaasBackend.Controllers.Physicians
             {
                 AppointmentId = form.AppointmentId,
                 Symptom = form.Symptom,
-                PastMedicalHistory = form.Symptom,
-                Diagnosis = form.Diagnosis
+                PastMedicalHistory = form.PastMedicalHistory,
+                Diagnosis = form.Diagnosis,
+                Prescription = form.Prescription
             };
             _context.MedicalRecords.Add(medicalRecord);
             await _context.SaveChangesAsync();

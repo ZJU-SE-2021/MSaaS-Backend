@@ -29,7 +29,11 @@ namespace MsaasBackend.Tests.IntegrationTests
         {
             var form = new MedicalRecordForm()
             {
-                AppointmentId = 2
+                AppointmentId = 2,
+                Diagnosis = "Diagnosis",
+                PastMedicalHistory = "PastMedicalHistory",
+                Prescription = "Prescription",
+                Symptom = "Symptom"
             };
 
             var res = await PostJsonAs("/physicians/medicalrecords", form, Physician);
