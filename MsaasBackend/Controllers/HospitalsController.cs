@@ -39,12 +39,13 @@ namespace MsaasBackend.Controllers
                 return Ok(JsonSerializer.Deserialize<HospitalDto[]>(cachedHospitals));
             }
             var hospitals = from h in _context.Hospitals select h.ToDto();
-            var serializedString = JsonSerializer.Serialize(hospitals);
+            var hospitalsList = await hospitals.ToListAsync();
+            var serializedString = JsonSerializer.Serialize(hospitalsList);
             var option =
                 new DistributedCacheEntryOptions().SetAbsoluteExpiration(DateTime.Now.AddHours(2));
             await _distributedCache.SetStringAsync("Hospitals", serializedString, option);
 
-            return Ok(await hospitals.ToListAsync());
+            return Ok(hospitalsList);
         }
 
         [HttpGet("{id:int}")]
@@ -52,17 +53,18 @@ namespace MsaasBackend.Controllers
         public async Task<IActionResult> GetHospital(int id)
         {
             var cachedHospital = await _distributedCache.GetStringAsync($"Hospitals/{id}");
-            if (cachedHospital != null && cachedHospital != "[]")
+            if (cachedHospital != null && cachedHospital != "{}")
             {
                 return Ok(JsonSerializer.Deserialize<HospitalDto>(cachedHospital));
             }
             var hospital = await _context.Hospitals.FindAsync(id);
             if (hospital == null) return NotFound();
-            var serializedString = JsonSerializer.Serialize(hospital);
+            var hospitalDto = hospital.ToDto();
+            var serializedString = JsonSerializer.Serialize(hospitalDto);
             var option =
                 new DistributedCacheEntryOptions().SetAbsoluteExpiration(DateTime.Now.AddHours(2));
             await _distributedCache.SetStringAsync($"Hospitals/{id}", serializedString, option);
-            return Ok(hospital.ToDto());
+            return Ok(hospitalDto);
         }
     }
 }
