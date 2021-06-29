@@ -70,6 +70,7 @@ namespace MsaasBackend.Tests.IntegrationTests
                 services.Remove(descriptor);
 
                 services.AddDbContext<DataContext>(options => { options.UseInMemoryDatabase(_dbName); });
+                services.AddDistributedMemoryCache();
 
                 var sp = services.BuildServiceProvider();
 

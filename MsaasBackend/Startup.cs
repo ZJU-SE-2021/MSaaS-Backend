@@ -77,6 +77,11 @@ namespace MsaasBackend
 
             services.AddControllers();
             services.AddSignalR();
+            services.AddStackExchangeRedisCache(options =>
+            {
+                options.Configuration = Configuration.GetConnectionString("Redis");
+            });
+
 
             services.AddSwaggerGen(c =>
             {
