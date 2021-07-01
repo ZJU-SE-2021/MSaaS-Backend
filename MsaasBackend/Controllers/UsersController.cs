@@ -13,6 +13,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
+using MsaasBackend.Helpers;
 using MsaasBackend.Models;
 using BC = BCrypt.Net.BCrypt;
 

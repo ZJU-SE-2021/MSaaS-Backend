@@ -1,7 +1,7 @@
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 
-namespace MsaasBackend.Controllers
+namespace MsaasBackend.Helpers
 {
     public static class AuthenticationDefaults
     {

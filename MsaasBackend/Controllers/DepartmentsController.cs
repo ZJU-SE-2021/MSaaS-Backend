@@ -9,6 +9,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Caching.Distributed;
 using Microsoft.Extensions.Logging;
+using MsaasBackend.Helpers;
 using MsaasBackend.Models;
 
 namespace MsaasBackend.Controllers
@@ -22,7 +23,8 @@ namespace MsaasBackend.Controllers
         private readonly DataContext _context;
         private readonly IDistributedCache _distributedCache;
 
-        public DepartmentsController(ILogger<DepartmentsController> logger, DataContext context, IDistributedCache distributedCache)
+        public DepartmentsController(ILogger<DepartmentsController> logger, DataContext context,
+            IDistributedCache distributedCache)
         {
             _logger = logger;
             _context = context;
@@ -33,17 +35,13 @@ namespace MsaasBackend.Controllers
         [ProducesResponseType(typeof(IEnumerable<DepartmentDto>), StatusCodes.Status200OK)]
         public async Task<IActionResult> GetDepartments(int? hospitalId)
         {
-            var cacheKey = "Departments";
-            if (hospitalId.HasValue)
-            {
-                cacheKey += $"?HospitalId={hospitalId}";
-            }
+            var cacheKey = Constants.CacheKey.GetDepartmentsCacheKey(hospitalId);
             var cachedDepartments = await _distributedCache.GetStringAsync(cacheKey);
             if (cachedDepartments != null && cachedDepartments != "[]")
             {
                 return Ok(JsonSerializer.Deserialize<DepartmentDto[]>(cachedDepartments));
             }
-            
+
             var departments =
                 from d in _context.Departments
                     .Include(d => d.Hospital)
@@ -61,12 +59,12 @@ namespace MsaasBackend.Controllers
         [ProducesResponseType(typeof(DepartmentDto), StatusCodes.Status200OK)]
         public async Task<IActionResult> GetDepartment(int id)
         {
-            var cachedDepartment = await _distributedCache.GetStringAsync($"Departments/{id}");
+            var cachedDepartment = await _distributedCache.GetStringAsync(Constants.CacheKey.GetDepartmentCacheKey(id));
             if (cachedDepartment != null && cachedDepartment != "{}")
             {
                 return Ok(JsonSerializer.Deserialize<DepartmentDto>(cachedDepartment));
             }
-            
+
             var department = await _context.Departments.FindAsync(id);
             if (department == null) return NotFound();
             await _context.Entry(department).Reference(d => d.Hospital).LoadAsync();
@@ -74,7 +72,8 @@ namespace MsaasBackend.Controllers
             var serializedString = JsonSerializer.Serialize(departmentDto);
             var option =
                 new DistributedCacheEntryOptions().SetAbsoluteExpiration(DateTime.Now.AddHours(2));
-            await _distributedCache.SetStringAsync($"Departments/{id}", serializedString, option);
+            await _distributedCache.SetStringAsync(Constants.CacheKey.GetDepartmentCacheKey(id), serializedString,
+                option);
             return Ok(departmentDto);
         }
     }
