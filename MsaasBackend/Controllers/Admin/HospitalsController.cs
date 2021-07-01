@@ -4,6 +4,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Caching.Distributed;
 using Microsoft.Extensions.Logging;
 using MsaasBackend.Helpers;
 using MsaasBackend.Models;
@@ -17,11 +18,14 @@ namespace MsaasBackend.Controllers.Admin
     {
         private readonly ILogger<HospitalsController> _logger;
         private readonly DataContext _context;
+        private readonly IDistributedCache _distributedCache;
 
-        public HospitalsController(ILogger<HospitalsController> logger, DataContext context)
+        public HospitalsController(ILogger<HospitalsController> logger, DataContext context,
+            IDistributedCache distributedCache)
         {
             _logger = logger;
             _context = context;
+            _distributedCache = distributedCache;
         }
 
         [HttpPost]
@@ -40,6 +44,8 @@ namespace MsaasBackend.Controllers.Admin
 
             _context.Hospitals.Add(hospital);
             await _context.SaveChangesAsync();
+            // Invalidate cache
+            await _distributedCache.RemoveAsync(Constants.CacheKey.GetHospitalsCacheKey);
             return CreatedAtAction("GetHospital", new {Id = hospital.Id}, hospital.ToDto());
         }
 
@@ -59,6 +65,9 @@ namespace MsaasBackend.Controllers.Admin
 
             hospital.Address = form.Address;
             await _context.SaveChangesAsync();
+            // Invalidate cache
+            await _distributedCache.RemoveAsync(Constants.CacheKey.GetHospitalsCacheKey);
+            await _distributedCache.RemoveAsync(Constants.CacheKey.GetHospitalCacheKey(hospital.Id));
             return Ok(hospital.ToDto());
         }
 
@@ -78,6 +87,9 @@ namespace MsaasBackend.Controllers.Admin
             }
 
             await _context.SaveChangesAsync();
+            // Invalidate cache
+            await _distributedCache.RemoveAsync(Constants.CacheKey.GetHospitalsCacheKey);
+            await _distributedCache.RemoveAsync(Constants.CacheKey.GetHospitalCacheKey(hospital.Id));
             return Ok();
         }
     }

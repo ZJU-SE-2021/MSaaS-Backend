@@ -23,7 +23,8 @@ namespace MsaasBackend.Controllers
         private readonly DataContext _context;
         private readonly IDistributedCache _distributedCache;
 
-        public HospitalsController(ILogger<HospitalsController> logger, DataContext context, IDistributedCache distributedCache)
+        public HospitalsController(ILogger<HospitalsController> logger, DataContext context,
+            IDistributedCache distributedCache)
         {
             _logger = logger;
             _context = context;
@@ -34,17 +35,18 @@ namespace MsaasBackend.Controllers
         [ProducesResponseType(typeof(IEnumerable<HospitalDto>), StatusCodes.Status200OK)]
         public async Task<IActionResult> GetHospitals()
         {
-            var cachedHospitals = await _distributedCache.GetStringAsync("Hospitals");
+            var cachedHospitals = await _distributedCache.GetStringAsync(Constants.CacheKey.GetHospitalsCacheKey);
             if (cachedHospitals != null && cachedHospitals != "[]")
             {
                 return Ok(JsonSerializer.Deserialize<HospitalDto[]>(cachedHospitals));
             }
+
             var hospitals = from h in _context.Hospitals select h.ToDto();
             var hospitalsList = await hospitals.ToListAsync();
             var serializedString = JsonSerializer.Serialize(hospitalsList);
             var option =
                 new DistributedCacheEntryOptions().SetAbsoluteExpiration(DateTime.Now.AddHours(2));
-            await _distributedCache.SetStringAsync("Hospitals", serializedString, option);
+            await _distributedCache.SetStringAsync(Constants.CacheKey.GetHospitalsCacheKey, serializedString, option);
 
             return Ok(hospitalsList);
         }
@@ -53,18 +55,20 @@ namespace MsaasBackend.Controllers
         [ProducesResponseType(typeof(HospitalDto), StatusCodes.Status200OK)]
         public async Task<IActionResult> GetHospital(int id)
         {
-            var cachedHospital = await _distributedCache.GetStringAsync($"Hospitals/{id}");
+            var cachedHospital = await _distributedCache.GetStringAsync(Constants.CacheKey.GetHospitalCacheKey(id));
             if (cachedHospital != null && cachedHospital != "{}")
             {
                 return Ok(JsonSerializer.Deserialize<HospitalDto>(cachedHospital));
             }
+
             var hospital = await _context.Hospitals.FindAsync(id);
             if (hospital == null) return NotFound();
             var hospitalDto = hospital.ToDto();
             var serializedString = JsonSerializer.Serialize(hospitalDto);
             var option =
                 new DistributedCacheEntryOptions().SetAbsoluteExpiration(DateTime.Now.AddHours(2));
-            await _distributedCache.SetStringAsync($"Hospitals/{id}", serializedString, option);
+            await _distributedCache.SetStringAsync(Constants.CacheKey.GetHospitalCacheKey(id), serializedString,
+                option);
             return Ok(hospitalDto);
         }
     }
