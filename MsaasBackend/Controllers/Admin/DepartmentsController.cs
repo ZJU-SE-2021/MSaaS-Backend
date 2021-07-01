@@ -4,6 +4,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Caching.Distributed;
 using Microsoft.Extensions.Logging;
 using MsaasBackend.Helpers;
 using MsaasBackend.Models;
@@ -17,11 +18,13 @@ namespace MsaasBackend.Controllers.Admin
     {
         private readonly ILogger<DepartmentsController> _logger;
         private readonly DataContext _context;
+        private readonly IDistributedCache _distributedCache;
 
-        public DepartmentsController(ILogger<DepartmentsController> logger, DataContext context)
+        public DepartmentsController(ILogger<DepartmentsController> logger, DataContext context, IDistributedCache distributedCache)
         {
             _logger = logger;
             _context = context;
+            _distributedCache = distributedCache;
         }
 
         [HttpDelete("{id:int}")]
@@ -32,6 +35,9 @@ namespace MsaasBackend.Controllers.Admin
             if (department == null) return NotFound();
             _context.Departments.Remove(department);
             await _context.SaveChangesAsync();
+            // Invalidate cache
+            await _distributedCache.RemoveAsync(Constants.CacheKey.GetDepartmentsCacheKey(department.HospitalId));
+            await _distributedCache.RemoveAsync(Constants.CacheKey.GetDepartmentCacheKey(id));
             return Ok();
         }
 
@@ -55,6 +61,10 @@ namespace MsaasBackend.Controllers.Admin
             await _context.SaveChangesAsync();
 
             await _context.Entry(department).Reference(d => d.Hospital).LoadAsync();
+            
+            // Invalidate cache
+            await _distributedCache.RemoveAsync(Constants.CacheKey.GetDepartmentsCacheKey(department.HospitalId));
+            await _distributedCache.RemoveAsync(Constants.CacheKey.GetDepartmentCacheKey(id));
 
             return Ok(department.ToDto());
         }
@@ -84,6 +94,9 @@ namespace MsaasBackend.Controllers.Admin
             await _context.SaveChangesAsync();
 
             await _context.Entry(department).Reference(d => d.Hospital).LoadAsync();
+            
+            // Invalidate cache
+            await _distributedCache.RemoveAsync(Constants.CacheKey.GetDepartmentsCacheKey(department.HospitalId));
 
             return CreatedAtAction("GetDepartment", new {Id = department.Id}, department.ToDto());
         }

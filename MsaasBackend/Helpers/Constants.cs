@@ -11,6 +11,22 @@ namespace MsaasBackend.Helpers
                 return $"Hospitals/{hospitalId}";
             }
 
+            public static string GetDepartmentsCacheKey(int? hospitalId)
+            {
+                var cacheKey = "Departments";
+                if (hospitalId.HasValue)
+                {
+                    cacheKey += $"?HospitalId={hospitalId}";
+                }
+
+                return cacheKey;
+            }
+            
+            public static string GetDepartmentCacheKey(int departmentId)
+            {
+                return $"Departments/{departmentId}";
+            }
+
         }   
     }
 }
