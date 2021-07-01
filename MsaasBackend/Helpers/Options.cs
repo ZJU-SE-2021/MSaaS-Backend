@@ -1,6 +1,6 @@
 using System.Text;
 
-namespace MsaasBackend
+namespace MsaasBackend.Helpers
 {
     public class JwtOptions
     {

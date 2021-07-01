@@ -6,6 +6,7 @@ using Microsoft.AspNetCore.SignalR;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using MsaasBackend.Controllers;
+using MsaasBackend.Helpers;
 using MsaasBackend.Models;
 
 namespace MsaasBackend.Hubs

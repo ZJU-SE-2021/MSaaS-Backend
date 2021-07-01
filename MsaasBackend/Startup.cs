@@ -11,6 +11,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
+using MsaasBackend.Helpers;
 using MsaasBackend.Hubs;
 using MsaasBackend.Models;
 using Swashbuckle.AspNetCore.SwaggerGen;
